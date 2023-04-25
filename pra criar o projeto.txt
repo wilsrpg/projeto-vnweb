@@ -1,0 +1,10 @@
+(node 18.15.0, npm 9.5.0)
+
+na pasta pai:
+npm init -y
+npm create vite@4.2.0
+(digite nome do projeto e as outras opções)
+cd (nome do projeto)
+npm install
+
+npm run dev
