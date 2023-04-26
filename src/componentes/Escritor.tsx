@@ -17,7 +17,7 @@ export default class Escritor {
 
     escrever(s: string){
       console.log(this.roteiro);
-      this.sistema?.exibirMensagem(s);
+      this.sistema?.escreverMensagem(s);
       
     }
 }

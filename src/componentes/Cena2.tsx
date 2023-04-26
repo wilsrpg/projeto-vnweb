@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect } from "react";
 import { contexto } from "./Sistema";
 import bgi from "../arquivos/bgi-viladestruida.png";
 import bgm from "../arquivos/bgm-teste.ogg";
-import { personagens } from "./Personagens";
+import { personagens } from "./mapeadores/Personagens";
 import Escritor from "./Escritor";
 
 type evento = {
@@ -37,7 +37,7 @@ export default function Cena2() {
     console.log("ef cena2 []");
     sistema?.mudarImagemDeFundo(bgi);
     sistema?.mudarMusica(bgm);
-    sistema?.irParaEvento(-1);
+    sistema?.irParaEvento(0);
     capturarTeclaCB();
     Escritor.getInstance().definirSistema(sistema);
   }, [])
@@ -91,6 +91,12 @@ export default function Cena2() {
           let bgm = roteiro[i].bgm;
           if(bgm)
             sistema?.mudarMusica(bgm);
+        }
+        
+        if(roteiro[i].som){
+          let som = roteiro[i].som;
+          if(som)
+            sistema?.tocarSom(som);
         }
         
         // if('sprite' in roteiro[i] && roteiro[i].hasOwnProperty("posicaoSprite"))

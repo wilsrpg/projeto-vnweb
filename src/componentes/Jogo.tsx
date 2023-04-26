@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useReducer, useCallback } from "react";
 import { Acao, acoes, IVariaveis, contexto } from "./Sistema";
 import TelaInicial from "./TelaInicial"
-import { cenas } from "./Cenas";
-import { musicas } from "./Musicas";
-import { sons } from "./Sons";
-import { personagens } from "./Personagens";
+import { cenas } from "./mapeadores/Cenas";
+import { musicas } from "./mapeadores/Musicas";
+import { sons } from "./mapeadores/Sons";
+import { personagens } from "./mapeadores/Personagens";
 
 //variáveis do sistema; adicione ou modifique no arquivo Sistema.tsx
 const estadoInicial: IVariaveis = {
@@ -170,6 +170,7 @@ export default function Jogo() {
     //esse array sempre começa com length 1 por causa do elemento null inicial;
     if(estado.personagensNaTela[0] === null) //então, pra não dar problemas,
       estado.personagensNaTela.splice(0,1); //o elemento inicial é removido
+    
   }, [])
 
   //mudar a imagem de fundo (bgi)
@@ -348,9 +349,15 @@ export default function Jogo() {
   
   //adicione as cenas no arquivo Cenas.tsx
   function selecionarCena(){
+    //let ss = "cena"+estado.cenaAtual;
+    //if(estado.cenaAtual == 0)
+    //  return <TelaInicial />
+    //else
+    //  return cenas[ss];
+
     switch (estado.cenaAtual) {
       case 0:
-        return <TelaInicial />
+        return <TelaInicial/>
       case 1:
         return cenas.cena1;
       case 2:

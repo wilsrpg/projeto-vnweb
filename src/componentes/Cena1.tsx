@@ -4,7 +4,7 @@ import bgi from "../arquivos/bgi-vila.png";
 //import bgm from "../arquivos/bgm-idk.ogg";
 import bgm from "../arquivos/bgm-titulo.ogg";
 // import { personagens } from "./Personagens";
-import { roteiro } from "./Roteiro1";
+import { roteiro } from "./roteiros/Roteiro1";
 
 /*type evento = {
   texto?: string,

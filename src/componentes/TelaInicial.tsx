@@ -3,7 +3,7 @@ import { contexto } from "./Sistema";
 import bgi from "../arquivos/bgi-titulo.png";
 //import bgm from "../arquivos/bgm-titulo.ogg";
 import bgm from "../arquivos/bgm-idk.ogg";
-import { sons } from "./Sons";
+import { sons } from "./mapeadores/Sons";
 
 export default function TelaInicial() {
   const sistema = useContext(contexto);
@@ -55,7 +55,7 @@ export default function TelaInicial() {
 
   function menuContinuar() {
     tocarBip();
-    // sistema?.mudarCena(2);
+     sistema?.mudarCena(2);
   }
 
   function menuOpcoes() {
