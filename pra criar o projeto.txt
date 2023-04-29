@@ -3,8 +3,9 @@
 na pasta pai:
 npm init -y
 npm create vite@4.2.0
-(digite nome do projeto e as outras opções)
+(digite o nome do projeto, dps escolha react e dps typescript)
 cd (nome do projeto)
 npm install
 
+pra executar:
 npm run dev

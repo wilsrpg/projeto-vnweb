@@ -5,18 +5,21 @@ import { cenas } from "./mapeadores/Cenas";
 import { musicas } from "./mapeadores/Musicas";
 import { sons } from "./mapeadores/Sons";
 import { personagens } from "./mapeadores/Personagens";
+import Apresentacao from "./Apresentacao";
+import BotaoSom from "./BotaoSom";
 
 //variáveis do sistema; adicione ou modifique no arquivo Sistema.tsx
 const estadoInicial: IVariaveis = {
+  //sistemaOcupado: true,
   imagemDeFundo: "",
   musica: "",
   musicas: musicas,
   sons: sons,
-  audioHabilitado: true,
-  cenaAtual: 0,
+  //audioHabilitado: true,
+  cenaAtual: -1,
   eventoAtual: -1,
   personagens: personagens,
-  ultimoPersonagemAdicionado: {endereco: "", posicao: 0 },
+  ultimoPersonagemAdicionado: null,
   ultimoPersonagemRemovido: null,
   personagensNaTela : [null],
 };
@@ -25,22 +28,28 @@ const estadoInicial: IVariaveis = {
 //uma variável que ativa um effect para executar as ações necessárias
 function redutor(variaveis: IVariaveis, acao: Acao) {
   switch (acao.tipo) {
+    //case acoes.ocuparSistema:
+    //  return { ...variaveis, sistemaOcupado : true };
+    //  case acoes.desocuparSistema:
+    //    return { ...variaveis, sistemaOcupado : false };
     case acoes.mudarImagemDeFundo:
       return { ...variaveis, imagemDeFundo : acao.endereco };
     case acoes.mudarMusica:
       return { ...variaveis, musica : acao.endereco };
-    case acoes.alternarAudio:
-      if(acao.valor == 1)
-        return { ...variaveis, audioHabilitado : true };
-      if(acao.valor == 0)
-        return { ...variaveis, audioHabilitado : false };
-      if(acao.valor == -1)
-        return { ...variaveis, audioHabilitado : !variaveis.audioHabilitado };
+    //case acoes.alternarAudio:
+    //  if(acao.valor == 1)
+    //    return { ...variaveis, audioHabilitado : true };
+    //  if(acao.valor == 0)
+    //    return { ...variaveis, audioHabilitado : false };
+    //  if(acao.valor == -1)
+    //    return { ...variaveis, audioHabilitado : !variaveis.audioHabilitado };
     case acoes.mudarCena:
       return { ...variaveis, cenaAtual : acao.valor };
-      case acoes.mudarEvento:
-        return { ...variaveis, eventoAtual: acao.valor };
+    case acoes.mudarEvento:
+      return { ...variaveis, eventoAtual: acao.valor };
     case acoes.adicionarPersonagem:
+      if(acao.valor == -1)
+        return { ...variaveis, ultimoPersonagemAdicionado: null };
       const pers = {endereco: acao.endereco, posicao: acao.valor};
       return { ...variaveis, ultimoPersonagemAdicionado : pers };
     case acoes.removerPersonagem:
@@ -66,75 +75,113 @@ export default function Jogo() {
     canvasRef.current.height = 480;
   }*/
   const bgiRef = useRef<HTMLImageElement>(null);
-  const bgmRef = useRef<HTMLAudioElement>(null);
+  //const bgmRef = useRef<HTMLAudioElement>(null);
   const persRef = useRef<HTMLDivElement>(null);
   const dialRef = useRef<HTMLPreElement>(null);
-  const audioHabilitado = useRef(true);
-  const som = new Audio(sons.confirmar);
-  const bip = useRef<HTMLAudioElement>();
+  //const audioHabilitado = useRef(true);
+  const somAudio = new Audio();
+  //const bip = useRef<HTMLAudioElement>();
   const exibindoCaixaDeDialogo = useRef(false);
-  const soletrando = useRef(false);
+  //const soletrando = useRef(false);
+  let soletrando = false;
+  const sistemaOcupado = useRef(false);
+  //let sistemaOcupado = true;
+  //const eventoAtual2 = useRef(-1);
+  
+  //function capturarClique(e: MouseEvent) {
+  function capturarClique(e: React.MouseEvent) {
+    //let botao = event.button;
+    if (e.button == 0){
+      //alert("capturou botão");
+      console.log("clicou");
+      interagir();
+    }
+  }
+  //const capturarCliqueCB = useCallback(()=>
+  //  document.getElementById("tela")?.addEventListener("click",capturarClique), []);
 
   const teclasCount = useRef(0);
-  function capturarTecla(ev: KeyboardEvent){
-    if(ev.repeat) return;
+  function capturarTecla(e: KeyboardEvent){
+  //function capturarTecla(e: React.KeyboardEvent){
+    if(e.repeat) return;
     teclasCount.current++;
-    console.log("apertou '"+ev.key+"'")
+    console.log("apertou '"+e.key+"'")
     console.log("teclasCount="+teclasCount.current);
     //ev.stopImmediatePropagation();
-    if(ev.key=="m"){
-      botaoDeSom();
-      //ev.stopImmediatePropagation();
+    //if(e.key=="m"){
+    //  //botaoDeSom();
+    //  alternarAudio();
+    //  //ev.stopImmediatePropagation();
+    //}
+    if(e.key=="z" || e.key=="Enter"){
+      interagir();
+      //e.stopPropagation();
+      //e.stopImmediatePropagation();
     }
-    if(ev.key=="z" || ev.key=="Enter"){
-      passarMensagem();
-      //ev.stopPropagation();
-      //ev.stopImmediatePropagation();
-    }
-    if(ev.key=="Backspace"){
+    if(e.key=="Backspace"){
       console.log("cena="+estado.cenaAtual);
-      if(estado.cenaAtual !== 0){
+      if(estado.cenaAtual > 0){
         console.log("aee");
-        passarMensagem();
+        interagir();
         removerPersonagem(0);
-        passarMensagem();
+        interagir();
         mudarCena(0);
       }
     }
     //ev.stopPropagation();
     //ev.stopImmediatePropagation();
   }
-  const capturarTeclaCB = useCallback(()=>
-  document.addEventListener("keydown",
-    //(ev)=>{}
-    capturarTecla
-  ) ,[]);
-  console.log("Jogo: renderizou");
+  //const capturarTeclaCB = useCallback(()=>
+  //  document.addEventListener("keydown",capturarTecla) ,[]);
+
+  console.log("renderizou jogo");
 
   //funções de encapsulamento dos despaches do reducer
   //(obs.: futuramnt, passar pra componente de controle)
+  function ocuparSistema(){
+    console.log("ocuparSistema()");
+    //despachar({tipo: acoes.ocuparSistema, endereco: "", valor: 0});
+    sistemaOcupado.current = true;
+    //sistemaOcupado = true;
+  }
+  function desocuparSistema(){
+    console.log("desocuparSistema()");
+    //despachar({tipo: acoes.desocuparSistema, endereco: "", valor: 0});
+    sistemaOcupado.current = false;
+    //sistemaOcupado = false;
+  }
   function mudarImagemDeFundo(endereco: string){
     despachar({tipo: acoes.mudarImagemDeFundo, endereco: endereco, valor: 0});
   }
   function mudarMusica(endereco: string){
     despachar({tipo: acoes.mudarMusica, endereco: endereco, valor: 0});
   }
-  function alternarAudio() {
-    despachar({tipo: acoes.alternarAudio, endereco: "", valor: -1});
-    audioHabilitado.current = !audioHabilitado.current;
-    console.log("audio: "+audioHabilitado.current);
-  }
+  //function alternarAudio() {
+  //  despachar({tipo: acoes.alternarAudio, endereco: "", valor: -1});
+  //  //audioHabilitado.current = !audioHabilitado.current; //verificar isso aki
+  //  //console.log("audio: "+audioHabilitado.current);
+  //  console.log("audio: "+estado.audioHabilitado);
+  //}
   function mudarCena(cena: number){
     despachar({tipo: acoes.mudarCena, endereco: "", valor: cena});
   }
   function proximoEvento(){
     // alert("a");
-    despachar({tipo: acoes.mudarEvento, endereco: "",
-               valor: estado.eventoAtual+1});
+    //if(!estado.sistemaOcupado)
+    //if(!sistemaOcupado.current)
+    //if(!sistemaOcupado){
+      despachar({tipo: acoes.mudarEvento, endereco: "",
+                valor: estado.eventoAtual+1});
+    //eventoAtual2.current++;
+    // sistemaOcupado = true;
+    //}
+    //console.log("entrou proximoEvento="+eventoAtual2.current);
+    console.log("entrou proximoEvento="+estado.eventoAtual);
   }
   function irParaEvento(i: number){
     // alert("pulou pro evento "+i);
     despachar({tipo: acoes.mudarEvento, endereco: "", valor: i});
+    //eventoAtual2.current = i;
   }
   function adicionarPersonagem(endereco: string, posicao: number){
     despachar({tipo: acoes.adicionarPersonagem,
@@ -144,33 +191,46 @@ export default function Jogo() {
     despachar({tipo: acoes.removerPersonagem, endereco: "", valor: indice});
   }
   function removerTodosOsPersonagens(){
-    let n = estado.personagensNaTela.length-1;
-    while(n >= 0) {
-      // alert("removendo pers "+n);
-      removerPersonagem(n);
-      n--;
-    }
+    //let n = estado.personagensNaTela.length-1;
+    //while(n >= 0) {
+    //  // alert("removendo pers "+n);
+    //  removerPersonagem(n);
+    //  n--;
+    //}
+    //alert("persNaTela.length="+estado.personagensNaTela.length);
+    if(estado.personagensNaTela.length>0)
+      estado.personagensNaTela.splice(0,estado.personagensNaTela.length);
+    //alert("persNaTela.length(dps d splice)="+estado.personagensNaTela.length);
+    //alert("persRef.length="+persRef.current?.childNodes.length);
+    if(persRef.current?.childElementCount)
+      while(persRef.current.childElementCount>0){
+        persRef.current.firstElementChild?.remove();
+        //alert("removeu um child\npersRef.length="+persRef.current?.childNodes.length);
+      }
   }
-  function tocarSom(som2: string){
-    if (estado.audioHabilitado) {
-      som.src = som2;
-      //const bip = new Audio(sistema.estado.sons.confirmar);
-      // if(bip.current)
-      //   bip.current.src = som2;
-      som.play();
-      // bip.current?.play();
-    }
+
+  function tocarSom(som: string){
+    //if (audioHabilitado.current) {
+    //if (estado.audioHabilitado) {
+      somAudio.src = som;
+      somAudio.play();
+    //}
   }
 
   //configurações iniciais
   useEffect(()=>{
     console.log("ef jogo []");
-    capturarTeclaCB();
+    //if(!document.getElementById("tela")?.hasAttribute("onclick"))
+    //  document.getElementById("tela")?.addEventListener("click",capturarClique);
+    if(!document.body.hasAttribute("onkeydown"))
+      document.body.addEventListener("keydown",capturarTecla);
+    else alert("tem");
+    // capturarCliqueCB();
+    // capturarTeclaCB();
     // irParaEvento(-1);
     //esse array sempre começa com length 1 por causa do elemento null inicial;
     if(estado.personagensNaTela[0] === null) //então, pra não dar problemas,
       estado.personagensNaTela.splice(0,1); //o elemento inicial é removido
-    
   }, [])
 
   //mudar a imagem de fundo (bgi)
@@ -200,41 +260,41 @@ export default function Jogo() {
     if(elem.hasAttribute("opacity"))
       opacInicial = parseInt(elem.style.opacity);
     const fadeOut = [{ opacity: opacInicial },{ opacity: 0 }];
-    //await img.animate(fadeOut, tempo*1000).finished;
     elem.style.opacity = "0";
     return elem.animate(fadeOut, tempo*1000).finished;
   }
 
   async function exibirElemento(elem: HTMLElement, tempo=0.5, opacFinal=1) {
     const fadeIn = [{ opacity: 0 },{ opacity: opacFinal}];
-    //await img.animate(fadeIn, tempo*1000).finished;
     elem.style.opacity = ""+opacFinal;
     return elem.animate(fadeIn, tempo*1000).finished;
   }
 
   //mudar a música de fundo (bgm)
-  useEffect(() => {
-    console.log("ef bgm/audio");
-    if(!bgmRef.current || !estado.musica) return;
-    bgmRef.current.src=estado.musica;
-    if (audioHabilitado.current){
-      //bgmRef.current.load();
-      bgmRef.current.play();
-    } else {
-      bgmRef.current.pause();
-      bgmRef.current.currentTime = 0;
-    }
-  }, [estado.musica,estado.audioHabilitado,audioHabilitado.current]);
+  //useEffect(() => {
+  //  console.log("ef bgm/audio");
+  //  if(!bgmRef.current || !estado.musica) return;
+  //  bgmRef.current.src = estado.musica;
+  //  if (estado.audioHabilitado){
+  //  //if (audioHabilitado.current){
+  //    //bgmRef.current.load();
+  //    bgmRef.current.play();
+  //  } else {
+  //    bgmRef.current.pause();
+  //    bgmRef.current.currentTime = 0;
+  //  }
+  ////}, [estado.musica, audioHabilitado.current]);
+  //}, [estado.musica, estado.audioHabilitado]);
   
   //adicionar personagens
   useEffect(()=>{
     console.log("ef ultPersAdic");
-    if(!estado.ultimoPersonagemAdicionado.endereco)
-      return;
-    const pers = new Image();
-    pers.src = estado.ultimoPersonagemAdicionado.endereco;
-    estado.personagensNaTela?.push(pers);
-    adicionarPersonagem2();
+    if(estado.ultimoPersonagemAdicionado != null){
+      const pers = new Image();
+      pers.src = estado.ultimoPersonagemAdicionado.endereco;
+      estado.personagensNaTela?.push(pers);
+      adicionarPersonagem2();
+    }
   }, [estado.ultimoPersonagemAdicionado])
 
   function adicionarPersonagem2(){
@@ -243,10 +303,11 @@ export default function Jogo() {
       pers.style.position = "absolute";
       pers.style.height = "100%";
       pers.style.width = "auto";
-      pers.style.left = estado.ultimoPersonagemAdicionado.posicao+"%";
+      pers.style.left = estado.ultimoPersonagemAdicionado?.posicao+"%";
       pers.style.top = "0";
     }
     if(pers && persRef.current){
+      despachar({tipo: acoes.adicionarPersonagem, endereco: "", valor: -1}); //faz com q estado.ultimoPersonagemAdicionado = null
       persRef.current.appendChild(pers);
       exibirElemento(pers);
     }
@@ -274,79 +335,74 @@ export default function Jogo() {
 
   //funções dos diálogos
   function apagarMensagem(){
+    soletrando = false;
     if(dialRef.current)
       dialRef.current.innerHTML = "";
   }
 
   async function exibirCaixaDeDialogo(){
+    //sistemaOcupado.current = true;
+    //sistemaOcupado = true;
     apagarMensagem();
-    if(dialRef.current){
-      if(!exibindoCaixaDeDialogo.current)
-        await exibirElemento(dialRef.current);
+    if(dialRef.current && !exibindoCaixaDeDialogo.current){
+      await exibirElemento(dialRef.current);
       //exibirOcultarCaixaDeDialogo(true);
       exibindoCaixaDeDialogo.current = true;
     }
   }
 
   async function ocultarCaixaDeDialogo(){
-    apagarMensagem();
-    if(dialRef.current){
-      //exibirOcultarCaixaDeDialogo(false);
-      if(exibindoCaixaDeDialogo.current)
-        await ocultarElemento(dialRef.current);
+    if(dialRef.current && exibindoCaixaDeDialogo.current){
+      apagarMensagem();
       exibindoCaixaDeDialogo.current = false;
+      await ocultarElemento(dialRef.current);
     }
   }
 
   async function soletrarMensagem(texto: string){
-    soletrando.current = true;
+    //sistemaOcupado = false;
+    sistemaOcupado.current = false;
     apagarMensagem();
+    //soletrando.current = true;
+    soletrando = true;
     let i = 0;
-    while(i < texto.length && soletrando.current) {
+    //while(i < texto.length && soletrando.current) {
+    while(i < texto.length && soletrando) {
       await new Promise((resolve)=>{setTimeout(() => {
-        if(dialRef.current)
+        if(dialRef.current && soletrando)
           dialRef.current.innerHTML += texto[i];
         i++;
         resolve("");
       }, 25)});
     }
-    if(dialRef.current && i < texto.length)
+    //alert(dialRef.current?.innerHTML);
+    if(dialRef.current && i < texto.length && dialRef.current.innerHTML)
       dialRef.current.innerHTML = texto;
-    soletrando.current = false;
+    //soletrando.current = false;
+    soletrando = false;
   }
 
   async function escreverMensagem(texto: string){
     if(!exibindoCaixaDeDialogo.current){
       await exibirCaixaDeDialogo();
     }
+    //if(!sistemaOcupado.current)
     await soletrarMensagem(texto);
   }
 
-  function passarMensagem(){
-    if(exibindoCaixaDeDialogo.current && soletrando.current)
-      soletrando.current = false;
+  function interagir(){
+    //console.log("entrou interagir, sistemaOcupado="+sistemaOcupado.current);
+    //if(exibindoCaixaDeDialogo.current && soletrando.current)
+    if(exibindoCaixaDeDialogo.current && soletrando)
+      //soletrando.current = false;
+      soletrando = false;
     else
+    if(!sistemaOcupado.current){
+      sistemaOcupado.current = true;
       proximoEvento();
-  }
-
-  function capturarClique(event: React.MouseEvent) {
-    let botao = event.button;
-    if (botao == 0){
-      //alert("capturou botão");
-      console.log("capturou botão");
-      passarMensagem();
     }
   }
 
-  function capturarTeclaOnkeydown(event: React.KeyboardEvent) {
-    let tecla = event.key;
-    if (tecla == "Enter"){
-      //alert("capturou tecla");
-      console.log("capturou tecla");
-      passarMensagem();
-    }
-  }
-  
   //adicione as cenas no arquivo Cenas.tsx
   function selecionarCena(){
     //let ss = "cena"+estado.cenaAtual;
@@ -356,8 +412,10 @@ export default function Jogo() {
     //  return cenas[ss];
 
     switch (estado.cenaAtual) {
+      case -1:
+        return <Apresentacao />;
       case 0:
-        return <TelaInicial/>
+        return <TelaInicial/>;
       case 1:
         return cenas.cena1;
       case 2:
@@ -368,25 +426,42 @@ export default function Jogo() {
     }
   }
 
-  //pra não passar as mensagens quando o som for desativado durante um diálogo
-  function botaoDeSom() {
-    alternarAudio();
-  }
+  //function botaoSom(e: React.MouseEvent) {
+  //  //pra não passar as mensagens quando o som for desativado durante um diálogo
+  //  e.stopPropagation();
+  //  alternarAudio();
+  //}
 
+  //function capturarTeclaOnkeydown(e: React.KeyboardEvent) {
+    //let tecla = e.key;
+    //if (tecla == "Enter"){
+    //  //alert("capturou tecla");
+    //  console.log("capturou tecla");
+    //  interagir();
+    //}
+    //capturarTecla(e);
+  //}
+  
   return (
     //<div id="tela" onClick={(event)=>{capturarClique(event)}} onKeyDown={(event)=>{capturarTeclaOnkeydown(event)}} style={{
-    <div id="tela" onClick={(event)=>{capturarClique(event)}} style={{
+    <div id="tela"
+    onClick={(e)=>{capturarClique(e)}}
+    //onKeyDown={(e)=>{capturarTeclaOnkeydown(e)}}
+    style={{
       position: "relative",
-      maxWidth: "640px",
-      maxHeight: "480px",
+      //maxWidth: "640px",
+      //maxHeight: "480px",
+      width: "640px",
+      height: "480px",
       backgroundColor: "black", //pros fade-outs das bgi's
-      color: "white"
     }}>
       <img id="bgi" ref={bgiRef} style={{
-        backgroundColor: "magenta", //nunca deve aparecer
+        //backgroundColor: "magenta", //nunca deve aparecer
+        position: "absolute",
+        top: "0",
         width: "100%",
         height: "100%",
-        display: "block"
+        display: "block",
       }} />
       
       {/*<canvas id="canvas" ref={canvasRef} style={{
@@ -401,7 +476,7 @@ export default function Jogo() {
         position: "absolute",
         top: "0",
         width: "100%",
-        height: "100%"
+        height: "100%",
       }}></div>
       
       <pre id="dialogo" ref={dialRef} style={{
@@ -413,31 +488,34 @@ export default function Jogo() {
         width: "90%",
         height: "25%",
         border: "0.2em ridge gray",
-        fontSize: "2em",
+        fontFamily: "times new roman",
+        fontSize: "1.5em",
+        color: "white",
         opacity: 0,
-        // overflowWrap: "break-word",
-        // wordWrap: "break-word",
         whiteSpace: "pre-wrap",
-        // display: "block",
       }}></pre>
 
-      <contexto.Provider value={{estado, despachar, mudarImagemDeFundo,
-          mudarMusica, mudarCena, tocarSom, adicionarPersonagem,
-          removerPersonagem, removerTodosOsPersonagens, proximoEvento,
-          irParaEvento, ocultarCaixaDeDialogo, escreverMensagem,
-          passarMensagem, apagarMensagem}}>
+      <contexto.Provider value={{estado, despachar, ocuparSistema,
+          //eventoAtual2:eventoAtual2.current,
+          desocuparSistema, mudarImagemDeFundo, mudarMusica, mudarCena,
+          tocarSom, adicionarPersonagem, removerPersonagem,
+          removerTodosOsPersonagens, proximoEvento, irParaEvento,
+          ocultarCaixaDeDialogo, escreverMensagem, interagir,
+          apagarMensagem}}>
         {selecionarCena()}
+        <BotaoSom/>
       </contexto.Provider>
       
-      <audio ref={bgmRef} loop />
+      {/*<audio ref={bgmRef} loop />*/}
       
-      <input
+      {/*<input
+        id="botaoSom"
         type="button"
         value="♫"
-        onClick={(ev)=>{ev.stopPropagation(); botaoDeSom();}}
-        //onKeyDown={(event)=>{if(event.key=="Enter")botaoDeSom(event)}}
+        onClick={(e)=>{botaoSom(e);}}
+        //onKeyDown={(event)=>{if(event.key=="Enter")botaoSom(event)}}
         style={{ position: "absolute", top: 0, right: 0 }}
-      />
+      />*/}
     </div>
   )
 }

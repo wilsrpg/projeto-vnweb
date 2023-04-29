@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect } from "react";
 import { contexto } from "./Sistema";
-import bgi from "../arquivos/bgi-viladestruida.png";
-import bgm from "../arquivos/bgm-teste.ogg";
+import bgi from "../midias/bgi-viladestruida.png";
+import bgm from "../midias/bgm-teste.ogg";
 import { personagens } from "./mapeadores/Personagens";
 import Escritor from "./Escritor";
 
@@ -39,7 +39,7 @@ export default function Cena2() {
     sistema?.mudarMusica(bgm);
     sistema?.irParaEvento(0);
     capturarTeclaCB();
-    Escritor.getInstance().definirSistema(sistema);
+    Escritor.obterInstancia().definirSistema(sistema);
   }, [])
 
   function capturarTecla(ev: KeyboardEvent){
@@ -129,7 +129,7 @@ export default function Cena2() {
           let tt = roteiro[i].texto?.toString();
           // Escritor.getInstance().escrever(roteiro[i].texto);
           if(tt)
-          Escritor.getInstance().escrever(tt);
+          Escritor.obterInstancia().escrever(tt);
         }
         } else
           sistema?.apagarMensagem();
@@ -139,7 +139,7 @@ export default function Cena2() {
             if(ms !== undefined){
               sistema?.apagarMensagem();
               await new Promise((resolve) => setTimeout(() => resolve(""), ms));
-              sistema?.passarMensagem();
+              sistema?.interagir();
             }
           }
   
@@ -184,17 +184,6 @@ export default function Cena2() {
     //Escritor.getInstance().escrever(roteiro[1]);
   }
 
-  function voltar() {
-    // sistema?.passarMensagem();
-    sistema?.removerPersonagem(0);
-    sistema?.removerTodosOsPersonagens();
-    sistema?.apagarMensagem();
-    // sistema?.passarMensagem();
-    sistema?.ocultarCaixaDeDialogo();
-    sistema?.irParaEvento(0);
-    sistema?.mudarCena(0);
-  }
-  
   function addChar() {
     //sistema?.despachar({tipo: acoes.adicionarPersonagem,
     //                    endereco: personagens.outro,
@@ -209,12 +198,23 @@ export default function Cena2() {
     sistema?.removerPersonagem(0);
   }
 
+  function voltar() {
+    // sistema?.passarMensagem();
+    //sistema?.removerPersonagem(0);
+    //sistema?.apagarMensagem();
+    // sistema?.passarMensagem();
+    sistema?.ocultarCaixaDeDialogo();
+    sistema?.removerTodosOsPersonagens();
+    //sistema?.irParaEvento(0);
+    sistema?.mudarCena(0);
+  }
+  
   return (
     <>
-    <button onClick={voltar}>Voltar</button>
+    <button onClick={voltar} style={{position: "relative"}}>Voltar</button>
     {/*<button onClick={addChar}>+char</button>
     <button onClick={subChar}>-char</button>*/}
-    <button onClick={iniciarDialogo}>Iniciar diálogo</button>
+    {/*<button onClick={iniciarDialogo}>Iniciar diálogo</button>*/}
     </>
   )
 }

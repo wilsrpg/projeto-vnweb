@@ -1,10 +1,9 @@
+//ainda não tá sendo usado
 export default class Escritor {
-
     static instancia: Escritor;
     sistema: any;
-    roteiro: string = "";
 
-    static getInstance() {
+    static obterInstancia() {
       if (Escritor.instancia == undefined) {
           Escritor.instancia = new Escritor();
       }
@@ -16,8 +15,6 @@ export default class Escritor {
     }
 
     escrever(s: string){
-      console.log(this.roteiro);
       this.sistema?.escreverMensagem(s);
-      
     }
 }
