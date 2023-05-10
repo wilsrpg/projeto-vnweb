@@ -18,34 +18,31 @@ export default function TelaInicial() {
   useEffect(()=>{
     console.log("ef telainicial []");
     sistema?.mudarImagemDeFundo(bgi);
-    sistema?.mudarMusica(bgm);
+    sistema?.mudarMusica(bgm, 50);
+    sistema?.ocultarCaixaDeDialogo();
     sistema?.ocuparSistema();
-    sistema?.irParaEvento(-1);
     //const menuInicial = document.getElementById("menu");
     //anexarMenu();
+    // if(!anexou)
     anexar(true);
     //anexar.current = true;
     // anexou2 = true;
+    sistema?.ocultarCaixaDeDialogo();
+    sistema?.irParaEvento(-1);
   }, [])
 
   useEffect(()=>{
-    if(anexou)
+    if(anexou){
+      while(menuInicial?.childElementCount)
+        menuInicial.firstChild?.remove();
       anexarMenu();
+    }
   }, [anexou]);
 
   //useEffect(()=>{
   //  if(anexar.current)
   //    anexarMenu();
   //}, [anexar.current]);
-
-  function tocarBip(){
-    // if (sistema?.estado.audioHabilitado) {
-    //   const bip = new Audio(sons.confirmar);
-    //   //const bip = new Audio(sistema.estado.sons.confirmar);
-    //   bip.play();
-    // }
-    sistema?.tocarSom(sons.confirmar);
-  }
 
   //async function menu2() {
   //  return (
@@ -58,35 +55,12 @@ export default function TelaInicial() {
   //  )
   //}
 
-  function menuNovoJogo() {
-    tocarBip();
-    sistema?.mudarCena(1);
-  }
-
-  function menuContinuar() {
-    tocarBip();
-    // sistema?.mudarCena(2);
-  }
-
-  function menuOpcoes() {
-    tocarBip();
-  }
-
-  function criarBotaoDeMenu(desc:string, func:()=>void) {
-    const botao = document.createElement("input");
-    botao.type = "button";
-    botao.value = desc;
-    botao.onclick = func;
-    //botao.parentElement?.appendChild(botao);
-    return botao;
-  }
-
   async function anexarMenu(){
     // if(anexou)
     //   return;
     // setAnexou(true);
     //anexou = true;
-
+    
     await new Promise((resolve) => setTimeout(() => resolve(""), 1000));
     console.log("entrou anexarmenu");
     menuInicial = document.getElementById("menu");
@@ -149,25 +123,36 @@ export default function TelaInicial() {
     // )
   }
 
-  function definirSetasPara(b: HTMLElement) {
-    b.addEventListener("keydown",setasBotao1);
-    //if(e.key == "ArrowUp")
-    //  e;
+  function criarBotaoDeMenu(desc:string, func:()=>void) {
+    const botao = document.createElement("input");
+    botao.type = "button";
+    botao.value = desc;
+    botao.onclick = func;
+    //botao.parentElement?.appendChild(botao);
+    return botao;
   }
 
-  function setasBotao1(e: KeyboardEvent) {
-    if(e.key == "ArrowUp")
-      e;
+  function menuNovoJogo() {
+    tocarBip();
+    sistema?.mudarCena(1);
   }
 
-  function setaBaixo(e: KeyboardEvent) {
-    if(e.key == "ArrowDown")
-      e;
+  function menuContinuar() {
+    tocarBip();
+    // sistema?.mudarCena(2);
   }
 
-  function setasLados(e: KeyboardEvent) {
-    if(e.key == "ArrowRight" || e.key == "ArrowLeft")
-      e;
+  function menuOpcoes() {
+    tocarBip();
+  }
+
+  function tocarBip(){
+    // if (sistema?.estado.audioHabilitado) {
+    //   const bip = new Audio(sons.confirmar);
+    //   //const bip = new Audio(sistema.estado.sons.confirmar);
+    //   bip.play();
+    // }
+    sistema?.tocarSom(sons.confirmar);
   }
 
   //botões do menu, exibidos em grid (css);
@@ -192,8 +177,11 @@ export default function TelaInicial() {
         display: "grid",
         grid: "auto/max-content",
         placeContent: "space-evenly center",
+        // opacity: 0,
       }}>
-
+        {/* <button onClick={menuNovoJogo}>Novo Jogo</button>
+        <button onClick={menuContinuar}>Continuar</button>
+        <button onClick={menuOpcoes}>Opções</button> */}
       </div>
 
       /*<div style={{

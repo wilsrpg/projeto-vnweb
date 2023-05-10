@@ -8,12 +8,21 @@ export default function BotaoSom() {
   const [audioHab, alternAudio] = useState(true);
   const bgmRef = useRef<HTMLAudioElement>(null);
   const somAudio = new Audio();
+  let volumeGeral = 0.5;
   
   //mudar a música de fundo (bgm)
   useEffect(()=>{
-    console.log("ef audio (música="+sistema?.estado.musica+")");
-    if(!bgmRef.current || !sistema?.estado.musica) return;
-    bgmRef.current.src = sistema?.estado.musica;
+    if(!bgmRef.current || !sistema?.estado.musica)
+      return;
+    if(sistema.estado.musica instanceof Object){
+      bgmRef.current.src = sistema?.estado.musica.endereco;
+      bgmRef.current.volume = sistema?.estado.musica.volume;
+    } else {
+      bgmRef.current.src = sistema?.estado.musica;
+      bgmRef.current.volume = 1;
+    }
+    bgmRef.current.volume *= volumeGeral;
+    console.log("ef audio (música="+bgmRef.current.src+")");
     //if (sistema?.estado.audioHabilitado){
     //if (audioHabilitado.current){
     if (audioHab){

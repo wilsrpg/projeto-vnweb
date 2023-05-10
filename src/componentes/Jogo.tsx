@@ -18,6 +18,7 @@ const estadoInicial: IVariaveis = {
   //audioHabilitado: true,
   cenaAtual: -1,
   eventoAtual: -1,
+  // executandoCena: false,
   personagens: personagens,
   ultimoPersonagemAdicionado: null,
   ultimoPersonagemRemovido: null,
@@ -35,7 +36,7 @@ function redutor(variaveis: IVariaveis, acao: Acao) {
     case acoes.mudarImagemDeFundo:
       return { ...variaveis, imagemDeFundo : acao.endereco };
     case acoes.mudarMusica:
-      return { ...variaveis, musica : acao.endereco };
+      return { ...variaveis, musica : {endereco: acao.endereco, volume: acao.valor} };
     //case acoes.alternarAudio:
     //  if(acao.valor == 1)
     //    return { ...variaveis, audioHabilitado : true };
@@ -47,10 +48,26 @@ function redutor(variaveis: IVariaveis, acao: Acao) {
       return { ...variaveis, cenaAtual : acao.valor };
     case acoes.mudarEvento:
       return { ...variaveis, eventoAtual: acao.valor };
+      // case acoes.executarCena:
+      //  return { ...variaveis, executandoCena : true };
+      //  case acoes.pararCena:
+      //    return { ...variaveis, executandoCena : false };
     case acoes.adicionarPersonagem:
-      if(acao.valor == -1)
+      if(acao.valor<0)
         return { ...variaveis, ultimoPersonagemAdicionado: null };
-      const pers = {endereco: acao.endereco, posicao: acao.valor};
+      // let pos = acao.valor;
+      let esp = false
+      if(acao.opcao === true)
+        esp = true;
+      // alert("acoes.adicpers valor="+acao.valor
+      //       +"valor trunc="+Math.trunc(acao.valor));
+      // if(acao.valor - Math.trunc(acao.valor) > 0){
+      //   esp = true;
+      //   pos = Math.trunc(acao.valor);
+      // }
+      // alert("acoes.adicpers esp="+esp);
+      const pers = {endereco: acao.endereco, posicao: acao.valor, espelhado: esp};
+      // const pers = {endereco: acao.endereco, posicao: pos, espelhado: esp};
       return { ...variaveis, ultimoPersonagemAdicionado : pers };
     case acoes.removerPersonagem:
       if(acao.valor == -1)
@@ -68,25 +85,26 @@ function redutor(variaveis: IVariaveis, acao: Acao) {
 
 export default function Jogo() {
   const [estado, despachar] = useReducer(redutor, estadoInicial);
+  const bgiImg = useRef<HTMLImageElement>(null);
   /*const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctx = canvasRef.current?.getContext('2d');
   if(canvasRef.current){
     canvasRef.current.width = 640;
     canvasRef.current.height = 480;
   }*/
-  const bgiRef = useRef<HTMLImageElement>(null);
+  const persDiv = useRef<HTMLDivElement>(null);
   //const bgmRef = useRef<HTMLAudioElement>(null);
-  const persRef = useRef<HTMLDivElement>(null);
-  const dialRef = useRef<HTMLPreElement>(null);
   //const audioHabilitado = useRef(true);
   const somAudio = new Audio();
   //const bip = useRef<HTMLAudioElement>();
+  const dialDiv = useRef<HTMLPreElement>(null);
   const exibindoCaixaDeDialogo = useRef(false);
   //const soletrando = useRef(false);
   let soletrando = false;
   const sistemaOcupado = useRef(false);
   //let sistemaOcupado = true;
   //const eventoAtual2 = useRef(-1);
+  // const executandoCena = useRef(false);
   
   //function capturarClique(e: MouseEvent) {
   function capturarClique(e: React.MouseEvent) {
@@ -153,8 +171,11 @@ export default function Jogo() {
   function mudarImagemDeFundo(endereco: string){
     despachar({tipo: acoes.mudarImagemDeFundo, endereco: endereco, valor: 0});
   }
-  function mudarMusica(endereco: string){
-    despachar({tipo: acoes.mudarMusica, endereco: endereco, valor: 0});
+  function mudarMusica(endereco: string, volume: number = 100){
+    if(volume > 100) volume = 100;
+    if(volume < 0) volume = 0;
+    volume /= 100;
+    despachar({tipo: acoes.mudarMusica, endereco: endereco, valor: volume});
   }
   //function alternarAudio() {
   //  despachar({tipo: acoes.alternarAudio, endereco: "", valor: -1});
@@ -183,9 +204,31 @@ export default function Jogo() {
     despachar({tipo: acoes.mudarEvento, endereco: "", valor: i});
     //eventoAtual2.current = i;
   }
-  function adicionarPersonagem(endereco: string, posicao: number){
+  // function executarCena(){
+  //   console.log("executarCena()");
+  //   despachar({tipo: acoes.executarCena, endereco: "", valor: 0});
+  // }
+  // function pararCena(){
+  //   console.log("pararCena()");
+  //   despachar({tipo: acoes.pararCena, endereco: "", valor: 0});
+  // }
+  function adicionarPersonagem(endereco: string, posicao: number, espelhado: boolean = false){
+    let pos = posicao;
+    // alert("tipo posicao="+typeof posicao+"\ntipo lado="+typeof lado);
+    // let tela = document.getElementById("tela");
+    // if(posicao>0 && posicao<1 && tela !== null){
+    //   // alert(parseInt(tela.style.width));
+    //   pos *= parseInt(tela.style.width);
+    // }
+    // alert("posicao="+posicao+"\ntela.width="+parseInt(tela!.style.width)+"\npos="+pos);
+    // if(espelhado === true)
+    //   pos+=0.5;
+    // alert("func adicpers esp="+espelhado);
+    //   despachar({tipo: acoes.adicionarPersonagem,
+    //              endereco: endereco, valor: posicao+0.5});
+    // else
     despachar({tipo: acoes.adicionarPersonagem,
-               endereco: endereco, valor: posicao});
+                endereco: endereco, valor: pos, opcao: espelhado});
   }
   function removerPersonagem(indice: number){
     despachar({tipo: acoes.removerPersonagem, endereco: "", valor: indice});
@@ -202,17 +245,20 @@ export default function Jogo() {
       estado.personagensNaTela.splice(0,estado.personagensNaTela.length);
     //alert("persNaTela.length(dps d splice)="+estado.personagensNaTela.length);
     //alert("persRef.length="+persRef.current?.childNodes.length);
-    if(persRef.current?.childElementCount)
-      while(persRef.current.childElementCount>0){
-        persRef.current.firstElementChild?.remove();
+    if(persDiv.current?.childElementCount)
+      while(persDiv.current.childElementCount>0){
+        persDiv.current.firstElementChild?.remove();
         //alert("removeu um child\npersRef.length="+persRef.current?.childNodes.length);
       }
   }
 
-  function tocarSom(som: string){
+  function tocarSom(som: string, volume: number = 100){
     //if (audioHabilitado.current) {
     //if (estado.audioHabilitado) {
       somAudio.src = som;
+      if(volume > 100) volume = 100;
+      if(volume < 0) volume = 0;
+      somAudio.volume = volume/100;
       somAudio.play();
     //}
   }
@@ -224,7 +270,8 @@ export default function Jogo() {
     //  document.getElementById("tela")?.addEventListener("click",capturarClique);
     if(!document.body.hasAttribute("onkeydown"))
       document.body.addEventListener("keydown",capturarTecla);
-    else alert("tem");
+    else
+      alert("ef jogo []: document.body.hasAttribute('onkeydown')==true");
     // capturarCliqueCB();
     // capturarTeclaCB();
     // irParaEvento(-1);
@@ -236,18 +283,18 @@ export default function Jogo() {
   //mudar a imagem de fundo (bgi)
   useEffect(() => {
     console.log("ef bgi");
-    if(!bgiRef.current || !estado.imagemDeFundo)
+    if(!bgiImg.current || !estado.imagemDeFundo)
       return;
     transicionarImagemDeFundo();
   }, [estado.imagemDeFundo]);
 
   //fade-out na bgi atual, fade-in na bgi seguinte
   async function transicionarImagemDeFundo(tempo = 0.5) {
-    if(bgiRef.current){
-      await ocultarElemento(bgiRef.current, tempo);
+    if(bgiImg.current){
+      await ocultarElemento(bgiImg.current, tempo);
       if (estado.imagemDeFundo)
-        bgiRef.current.src = estado.imagemDeFundo;
-      await exibirElemento(bgiRef.current, tempo);
+        bgiImg.current.src = estado.imagemDeFundo;
+      await exibirElemento(bgiImg.current, tempo);
     }
   }
 
@@ -292,6 +339,8 @@ export default function Jogo() {
     if(estado.ultimoPersonagemAdicionado != null){
       const pers = new Image();
       pers.src = estado.ultimoPersonagemAdicionado.endereco;
+      if(estado.ultimoPersonagemAdicionado.espelhado === true)
+        pers.style.transform = "rotateY(180deg)";
       estado.personagensNaTela?.push(pers);
       adicionarPersonagem2();
     }
@@ -300,15 +349,33 @@ export default function Jogo() {
   function adicionarPersonagem2(){
     const pers = estado.personagensNaTela[estado.personagensNaTela.length-1];
     if(pers){
+      //centralizar no ponto escolhido
+      let largura: number, altura: number, pos=0;
+      let tela = document.getElementById("tela");
+      // if(tela)
+      if(tela?.style.height !== undefined){
+        altura = parseInt(tela.style.height);
+        largura = pers.width / (pers.height / altura);
+        // alert("larg,alt="+largura+","+altura);
+        if(estado.ultimoPersonagemAdicionado?.posicao){
+          let posPorCento = estado.ultimoPersonagemAdicionado?.posicao/100;
+          pos = parseInt(tela.style.width)*posPorCento - largura/2;
+          // alert("pos%="+posPorCento+", pos="+pos);
+          // alert("pos final="+pos);
+        }
+      }
+      // alert("pos final="+pos);
       pers.style.position = "absolute";
       pers.style.height = "100%";
       pers.style.width = "auto";
-      pers.style.left = estado.ultimoPersonagemAdicionado?.posicao+"%";
+      pers.style.left = pos+"px";
+      // pers.style.left = estado.ultimoPersonagemAdicionado?.posicao+"%";
       pers.style.top = "0";
+      pers.style.userSelect = "none";
     }
-    if(pers && persRef.current){
+    if(pers && persDiv.current){
       despachar({tipo: acoes.adicionarPersonagem, endereco: "", valor: -1}); //faz com q estado.ultimoPersonagemAdicionado = null
-      persRef.current.appendChild(pers);
+      persDiv.current.appendChild(pers);
       exibirElemento(pers);
     }
   }
@@ -321,13 +388,14 @@ export default function Jogo() {
   }, [estado.ultimoPersonagemRemovido])
 
   async function removerPersonagem2(persId: number) {
-    if(persRef.current?.children[persId]){
-      const img = persRef.current?.children[persId];
+    if(persDiv.current?.children[persId]){
+      const img = persDiv.current?.children[persId];
       if(img instanceof HTMLImageElement){
         estado.personagensNaTela.splice(persId,1);
         despachar({tipo: acoes.removerPersonagem, endereco: "", valor: -1}); //faz com q estado.ultimoPersonagemRemovido = null
-        persRef.current.parentElement?.appendChild(img);
+        persDiv.current.parentElement?.appendChild(img);
         await ocultarElemento(img);
+        // ocultarElemento(img);
         img.remove();
       }
     }
@@ -336,48 +404,49 @@ export default function Jogo() {
   //funções dos diálogos
   function apagarMensagem(){
     soletrando = false;
-    if(dialRef.current)
-      dialRef.current.innerHTML = "";
+    if(dialDiv.current)
+      dialDiv.current.innerHTML = "";
   }
 
   async function exibirCaixaDeDialogo(){
     //sistemaOcupado.current = true;
     //sistemaOcupado = true;
     apagarMensagem();
-    if(dialRef.current && !exibindoCaixaDeDialogo.current){
-      await exibirElemento(dialRef.current);
+    // if(dialDiv.current && !exibindoCaixaDeDialogo.current && executandoCena.current){
+    if(dialDiv.current && !exibindoCaixaDeDialogo.current){
+      await exibirElemento(dialDiv.current);
       //exibirOcultarCaixaDeDialogo(true);
       exibindoCaixaDeDialogo.current = true;
     }
   }
 
   async function ocultarCaixaDeDialogo(){
-    if(dialRef.current && exibindoCaixaDeDialogo.current){
+    if(dialDiv.current && exibindoCaixaDeDialogo.current){
       apagarMensagem();
       exibindoCaixaDeDialogo.current = false;
-      await ocultarElemento(dialRef.current);
+      await ocultarElemento(dialDiv.current);
     }
   }
 
   async function soletrarMensagem(texto: string){
     //sistemaOcupado = false;
-    sistemaOcupado.current = false;
     apagarMensagem();
-    //soletrando.current = true;
+    sistemaOcupado.current = false;
     soletrando = true;
+    //soletrando.current = true;
     let i = 0;
     //while(i < texto.length && soletrando.current) {
     while(i < texto.length && soletrando) {
       await new Promise((resolve)=>{setTimeout(() => {
-        if(dialRef.current && soletrando)
-          dialRef.current.innerHTML += texto[i];
+        if(dialDiv.current && soletrando)
+          dialDiv.current.innerHTML += texto[i];
         i++;
         resolve("");
       }, 25)});
     }
     //alert(dialRef.current?.innerHTML);
-    if(dialRef.current && i < texto.length && dialRef.current.innerHTML)
-      dialRef.current.innerHTML = texto;
+    if(dialDiv.current && i < texto.length && dialDiv.current.innerHTML)
+      dialDiv.current.innerHTML = texto;
     //soletrando.current = false;
     soletrando = false;
   }
@@ -455,7 +524,7 @@ export default function Jogo() {
       height: "480px",
       backgroundColor: "black", //pros fade-outs das bgi's
     }}>
-      <img id="bgi" ref={bgiRef} style={{
+      <img id="bgi" ref={bgiImg} style={{
         //backgroundColor: "magenta", //nunca deve aparecer
         position: "absolute",
         top: "0",
@@ -471,7 +540,7 @@ export default function Jogo() {
         display: "block"
       }} />*/}
       
-      <div id="personagens" ref={persRef} style={{
+      <div id="personagens" ref={persDiv} style={{
         //backgroundColor: "cyan",
         position: "absolute",
         top: "0",
@@ -479,7 +548,7 @@ export default function Jogo() {
         height: "100%",
       }}></div>
       
-      <pre id="dialogo" ref={dialRef} style={{
+      <pre id="dialogo" ref={dialDiv} style={{
         backgroundColor: "rgba(0,0,255,0.5)",
         position: "absolute",
         bottom: 0,
@@ -495,13 +564,16 @@ export default function Jogo() {
         whiteSpace: "pre-wrap",
       }}></pre>
 
-      <contexto.Provider value={{estado, despachar, ocuparSistema,
+      <contexto.Provider value={{estado, despachar,
           //eventoAtual2:eventoAtual2.current,
-          desocuparSistema, mudarImagemDeFundo, mudarMusica, mudarCena,
-          tocarSom, adicionarPersonagem, removerPersonagem,
-          removerTodosOsPersonagens, proximoEvento, irParaEvento,
-          ocultarCaixaDeDialogo, escreverMensagem, interagir,
-          apagarMensagem}}>
+          ocuparSistema, desocuparSistema,
+          mudarImagemDeFundo, mudarCena,
+          mudarMusica, tocarSom,
+          adicionarPersonagem, removerPersonagem, removerTodosOsPersonagens,
+          irParaEvento, proximoEvento, interagir,
+          // executandoCena: executandoCena.current,
+          ocultarCaixaDeDialogo, escreverMensagem, apagarMensagem,
+      }}>
         {selecionarCena()}
         <BotaoSom/>
       </contexto.Provider>

@@ -4,13 +4,12 @@ import Escritor from "./Escritor";
 
 export type evento = {
   texto?: string,
-  sprite?: string,
-  posicaoSprite?: number,
+  sprite?: {endereco: string, posicao: number, espelhado?: boolean},
   bgi?: string,
-  bgm?: string,
-  som?: string,
+  bgm?: string | {endereco: string, volume?: number},
+  som?: string | {endereco: string, volume?: number},
   espera?: number,
-  esperaBotao?: any,
+  esperaBotao?: boolean,
 }
 
 //ainda não tá sendo usado
@@ -43,10 +42,10 @@ export default class Diretor {
     this.sistema?.escreverMensagem(s);
   }
   
-  ocupar() {
-    this.sistema?.ocuparSistema();
-    console.log("fun ocupar: dps d ocupar");
-  }
+  // ocupar() {
+  //   this.sistema?.ocuparSistema();
+  //   console.log("fun ocupar: dps d ocupar");
+  // }
   async executar() {
     console.log("executar");
     let i: number;
@@ -60,9 +59,9 @@ export default class Diretor {
 
         //sistema?.ocuparSistema();
         //let ocupado = true;
-        this.ocupar();
+        // this.ocupar();
         //ocupado.current = true;
-        console.log("executar: dps d ocupar");
+        // console.log("executar: dps d ocupar");
 
         if(!this.roteiro[i].texto){console.log("ocultando cx d txt");
         this.sistema.ocultarCaixaDeDialogo();
@@ -160,7 +159,7 @@ export default class Diretor {
         //sistema?.ocultarCaixaDeDialogo();
         //sistema?.ocuparSistema();
         //console.log("ocupar problemático");
-        this.ocupar();
+        // this.ocupar();
       }
     }
   }

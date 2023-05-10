@@ -76,7 +76,7 @@ export default function Apresentacao() {
       grid: "auto/max-content",
       placeContent: "center center",
     }}>
-      <p id="titulo" style={{opacity: 0}}>Estúdio Nome Temporário</p>
+      <label id="titulo" style={{opacity: 0}}>Estúdio Nome Temporário</label>
     </div>
   )
 }

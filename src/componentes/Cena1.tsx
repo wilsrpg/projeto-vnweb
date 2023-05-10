@@ -1,8 +1,10 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { contexto } from "./Sistema";
 import bgi from "../midias/bgi-vila.png";
 import bgm from "../midias/bgm-titulo.ogg";
-import { roteiro1 } from "./roteiros/Roteiro1";
+// import { roteiro1 } from "./roteiros/Roteiro1";
+import { roteiroTeste as roteiro1 } from "./roteiros/roteiroTeste";
+// import { rotteste as roteiro1 } from "./roteiros/Roteiro1";
 //import Escritor from "./Escritor";
 
 export default function Cena1() {
@@ -10,6 +12,7 @@ export default function Cena1() {
   //const [ocupado,ocupar] = useState(false);
   //const ocupado = useRef(false);
   //let ocupado = false;
+  // const executandoCena = useRef(false);
   console.log("renderizou cena1");
 
   //configurações iniciais
@@ -19,9 +22,13 @@ export default function Cena1() {
     sistema?.mudarImagemDeFundo(bgi);
     sistema?.mudarMusica(bgm);
     //Escritor.obterInstancia().definirSistema(sistema);
+    // if(sistema)
+    //   sistema.executandoCena = true;
+    // console.log(">"+sistema?.executandoCena);
     sistema?.desocuparSistema();
-    //sistema?.irParaEvento(0);
-    sistema?.proximoEvento();
+    sistema?.irParaEvento(0);
+    // sistema?.proximoEvento();
+    // executandoCena.current = true;
   }, [])
 
   //execução do roteiro
@@ -49,17 +56,19 @@ export default function Cena1() {
   //  }
   //}, [ocupado])
 
-  function ocupar() {
-      sistema?.ocuparSistema();
-      //console.log("fun ocupar: dps d ocupar");
-  }
-  function desocupar() {
-    sistema?.desocuparSistema();
-    //console.log("fun desocupar: dps d desocupar");
-  }
+  // function ocupar() {
+  //     sistema?.ocuparSistema();
+  //     //console.log("fun ocupar: dps d ocupar");
+  // }
+  // function desocupar() {
+  //   sistema?.desocuparSistema();
+  //   //console.log("fun desocupar: dps d desocupar");
+  // }
 
   async function executar() {
-    //console.log("executar");
+    // console.log("executandoCena="+executandoCena.current);
+    // console.log("executandoCena="+sistema?.executandoCena);
+    console.log("executar");
     let i: number;
     if(sistema?.estado.eventoAtual !== undefined) {
       i = sistema?.estado.eventoAtual;
@@ -69,7 +78,7 @@ export default function Cena1() {
       //if(i !== undefined)
       if(i>=0 && roteiro1[i]) {
         //if(i < roteiro.length) {
-        console.log("executando");
+        console.log("lendo roteiro");
 
         //sistema?.ocuparSistema();
         //let ocupado = true;
@@ -104,17 +113,23 @@ export default function Cena1() {
         }
         
         // if('sprite' in roteiro[i] && roteiro[i].hasOwnProperty("posicaoSprite"))
-        if(roteiro1[i].sprite && roteiro1[i].posicaoSprite){
+        if(roteiro1[i].sprite){
           console.log("mostrando sprite");
-          let spr = document.URL + roteiro1[i].sprite?.toString();
-          let n = roteiro1[i].posicaoSprite;
-          //let posSpr: number;
-          if(n !== undefined){
-            let posSpr = n;
+          let spr = document.URL + roteiro1[i].sprite?.endereco.toString();
+          let posSpr;
+            //let posSpr: number;
+          if(roteiro1[i].sprite?.posicao)
+            posSpr = roteiro1[i].sprite?.posicao;
+          let esp=false;
+          let espelhado=roteiro1[i].sprite?.espelhado;
+          if(espelhado !== undefined)
+            esp = espelhado;
+          if(posSpr !== undefined){
+            // let posSpr = n;
           // sistema?.adicionarPersonagem(roteiro[i].sprite, roteiro[i].posicaoSprite);
           //if(spr && posSpr !== undefined)
             if(posSpr>=0)
-              sistema?.adicionarPersonagem(spr, posSpr);
+              sistema?.adicionarPersonagem(spr, posSpr, esp);
             else {
               sistema?.estado.personagensNaTela.map((pers,i)=>{
                 // alert("i="+i+", pers="+pers?.src+", spr:"+spr);
@@ -125,9 +140,12 @@ export default function Cena1() {
               })
               // sistema?.removerPersonagem(-ps);
             }
+            // let esperaPadrao = 1000; //n eh legal pq impede d 2 personagens aparecem ao msm tempo
+            // await new Promise((resolve) => setTimeout(() => resolve(""), esperaPadrao));
           }
         }
-        
+        if(!roteiro1[i].espera)
+          roteiro1[i].espera = 10; //sem isso, ao remover 2 personagens seguidos, só o 1o tava sendo removido
         if(roteiro1[i].espera){
           console.log("esperando");
           let n = roteiro1[i].espera;
@@ -151,14 +169,18 @@ export default function Cena1() {
             sistema?.escreverMensagem(texto);
           // Escritor.obterInstancia().escrever(texto);
         //}
-        } else {
-          //sistema?.ocultarCaixaDeDialogo();
         }
+        // else {
+          //sistema?.ocultarCaixaDeDialogo();
+        // }
 
         //desocupar();
         //ocupado.current = false;
         //console.log("executar: dps d desocupar");
 
+        if(roteiro1[i].esperaBotao)
+          sistema.desocuparSistema();
+        
         //if(roteiro[i].esperaEPassa){
         //  let esp = roteiro[i].esperaEPassa;
         //  if(esp !== undefined && !sistema?.estado.sistemaOcupado){
@@ -169,8 +191,12 @@ export default function Cena1() {
         //    sistema?.interagir();
         //  }
         //}
+        // console.log("="+sistema.executandoCena)
+        // if(!roteiro1[i].texto && !roteiro1[i].esperaBotao && executandoCena.current){
+        // if(!roteiro1[i].texto && !roteiro1[i].esperaBotao && sistema.executandoCena){
+        // if(!roteiro1[i].texto && !roteiro1[i].esperaBotao && sistema.estado.cenaAtual == 1){
         if(!roteiro1[i].texto && !roteiro1[i].esperaBotao){
-          console.log("autoProxEvento");
+          console.log("autoProxEvento do evento "+sistema.estado.eventoAtual);
           sistema?.proximoEvento();
         }
 
@@ -179,6 +205,9 @@ export default function Cena1() {
         //} else
         //  sistema?.ocultarCaixaDeDialogo();
       } else if(i >= roteiro1.length) {
+        // executandoCena.current = false;
+        // if(sistema)
+        //   sistema.executandoCena = false;
         console.log("fim do roteiro");
         //sistema?.ocultarCaixaDeDialogo();
         //sistema?.ocuparSistema();
@@ -189,6 +218,9 @@ export default function Cena1() {
   }
 
   function voltar() {
+    // executandoCena.current = false;
+    // if(sistema)
+    //   sistema.executandoCena = false;
     // sistema?.interagir();
     //sistema?.apagarMensagem();
     sistema?.ocultarCaixaDeDialogo();
