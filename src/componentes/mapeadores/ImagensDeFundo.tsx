@@ -6,6 +6,6 @@ import bgiVilaDestruida from "../../midias/bgi-viladestruida.png";
 //acessíveis a todas as cenas
 export const imagensDeFundo = {
   titulo: bgiTitulo,
-  teste: bgiVila,
-  idk: bgiVilaDestruida,
+  vila: bgiVila,
+  vilaDestruida: bgiVilaDestruida,
 }

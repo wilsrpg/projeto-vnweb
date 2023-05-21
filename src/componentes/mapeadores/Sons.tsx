@@ -4,6 +4,6 @@ import somConfirmar2 from "../../midias/som-confirmar2.ogg";
 //todas os sons devem constar neste objeto para serem acessíveis a todas
 //as cenas
 export const sons = {
-  confirmar: somConfirmar,
-  confirmar2: somConfirmar2
+  bip: somConfirmar,
+  plem: somConfirmar2
 }
