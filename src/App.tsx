@@ -1,12 +1,7 @@
-//import './App.css'
-import Jogo from './componentes/Jogo';
+import Jogo from './componentes/sistema/Jogo';
 
 function App() {
-  return (
-    <div className="App">
-      <Jogo />
-    </div>
-  )
+  return <Jogo />
 }
 
 export default App

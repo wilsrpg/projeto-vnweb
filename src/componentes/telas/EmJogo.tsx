@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { roteiros } from "./mapeadores/Roteiros";
-import { acoes, contexto } from "./Sistema";
+import { roteiros } from "../roteiros/ListaDeRoteiros";
+import { acoes } from "../sistema/Redutor";
+import { contexto } from "../sistema/Contexto";
 
 export default function EmJogo() {
   const sistema = useContext(contexto);

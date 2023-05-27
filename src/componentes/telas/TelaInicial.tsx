@@ -1,13 +1,15 @@
 import { useContext, useEffect, useState } from "react";
-import bgi from "../midias/bgi-titulo.png";
-import bgm from "../midias/bgm-idk.ogg";
-import bip from "../midias/som-confirmar.ogg";
-import { acoes, contexto } from "./Sistema";
+import { acoes } from "../sistema/Redutor";
+import { contexto } from "../sistema/Contexto";
+import { imagensDeFundo } from "../mapeadoresDeArquivos/ImagensDeFundo";
+import { musicas } from "../mapeadoresDeArquivos/Musicas";
+import { sons } from "../mapeadoresDeArquivos/Sons";
+import Botao from "../interface/Botao";
 
 export default function TelaInicial() {
   const sistema = useContext(contexto);
-  const [anexou, anexar] = useState(false);
-  let menuInicial = document.getElementById("menu");;
+  //const [anexou, anexar] = useState(false);
+  let menuInicial = document.getElementById("menu");
   if(sistema?.estado.msgsConsole.renderizacoes)
     console.log("renderizou tela inicial");
   
@@ -15,15 +17,21 @@ export default function TelaInicial() {
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
       console.log("ef telainicial []");
-    sistema?.despachar({tipo: acoes.mudarImagemDeFundo, endereco: bgi});
-    sistema?.despachar({tipo: acoes.mudarMusica, endereco: bgm, numero1: 50});
+    sistema?.despachar({tipo: acoes.mudarImagemDeFundo, endereco: imagensDeFundo.titulo});
+    sistema?.despachar({tipo: acoes.mudarMusica, endereco: musicas.idk, numero1: 50});
     sistema?.despachar({tipo: acoes.aceitarInteracao, opcao: false});
     sistema?.despachar({tipo: acoes.mudarRoteiro, numero1: -1});
     sistema?.despachar({tipo: acoes.mudarEvento, numero1: -1});
-    anexar(true);
+    //anexar(true);
+    menuInicial = document.getElementById("menu");
+    new Promise((resolve) => {setTimeout(() => {resolve("");}, 1000);})
+    .then(()=>{
+    if(menuInicial){
+      sistema?.exibirElemento(menuInicial);}
+    })
   }, [])
 
-  useEffect(()=>{
+  /*useEffect(()=>{
     if(anexou){
       while(menuInicial?.childElementCount)
         menuInicial.firstChild?.remove();
@@ -69,40 +77,63 @@ export default function TelaInicial() {
     botao.value = desc;
     botao.onclick = func;
     return botao;
-  }
+  }*/
 
   function menuNovoJogo(){
-    tocarBip();
+    //tocarBip();
+    sistema?.despachar({tipo: acoes.mudarRoteiro, numero1: 1});
+    sistema?.despachar({tipo: acoes.mudarTela, string: "jogo"});
+    sistema?.despachar({tipo: acoes.definirDataDeInicio, numero1: Date.now()});
+  }
+
+  function menuTestarRoteiro(){
+    //tocarBip();
     sistema?.despachar({tipo: acoes.mudarRoteiro, numero1: 0});
     sistema?.despachar({tipo: acoes.mudarTela, string: "jogo"});
   }
 
-  function menuContinuar(){
-    tocarBip();
-    sistema?.despachar({tipo: acoes.mudarRoteiro, numero1: 1});
-    sistema?.despachar({tipo: acoes.mudarTela, string: "jogo"});
-  }
-
   function menuOpcoes(){
-    tocarBip();
+    //tocarBip();
     sistema?.despachar({tipo: acoes.exibirTelaDeOpcoes, opcao: true});
+    //sistema?.despachar({tipo: acoes.mudarTela, string: "opções"});
   }
 
-  function tocarBip(){
-    sistema?.despachar({tipo: acoes.tocarSom, endereco: bip});
+  function menuArquivos(){
+    //tocarBip();
+    sistema?.despachar({tipo: acoes.exibirTelaDeArquivos, opcao: true});
+    //sistema?.despachar({tipo: acoes.mudarMusica, endereco: ""});
+    //sistema?.despachar({tipo: acoes.mudarTela, string: "opções"});
   }
+  
+  //function tocarBip(){
+  //  sistema?.despachar({tipo: acoes.tocarSom, endereco: sons.bip});
+  //}
 
   return (
-    <div id="menu" style={{
-        position: "absolute",
-        width: "100%",
-        height: "25%",
-        bottom: "10%",
-        display: "grid",
-        grid: "auto/max-content",
-        placeContent: "space-evenly center",
-        // opacity: 0,
-      }}>
-    </div>
+    <>
+    {/*{!sistema?.estado.exibindoTelaDeOpcoes &&*/}
+      <div id="menu" style={{
+          position: "absolute",
+          width: "100%",
+          height: "33%",
+          bottom: "6%",
+          display: "grid",
+          grid: "auto/max-content",
+          placeContent: "space-evenly center",
+          opacity: 0,
+        }}>
+        {/*<button onClick={menuNovoJogo}>Novo Jogo</button>
+        <button onClick={menuContinuar}>Continuar</button>
+        <button onClick={menuOpcoes}>Opções</button>*/}
+        <Botao nome="Novo jogo" func={menuNovoJogo}/>
+        <Botao nome="Testar roteiro" func={menuTestarRoteiro}/>
+        <Botao nome="Opções" func={menuOpcoes}/>
+        <Botao nome="Gerenciar arquivos" func={menuArquivos}/>
+        {/*<Botao nome="Novo Jogo" func={menuNovoJogo} style={{opacity: 0}}/>
+        <Botao nome="Continuar" func={menuContinuar} style={{opacity: 0}}/>
+        <Botao nome="Opções" func={menuOpcoes} style={{opacity: 0}}/>*/}
+      </div>
+    {/*}*/}
+    </>
   )
 }

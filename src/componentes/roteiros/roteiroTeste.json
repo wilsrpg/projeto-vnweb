@@ -1,0 +1,21 @@
+{
+  "roteiro": [
+    {"mudarCenario": "imagensDeFundo.vila", "mudarMusica": "musicas.titulo", "esperarTempo": 2000},
+    {"adicionarPersonagem": {"nome": "protagonista", "endereco": "personagens.protagonista", "posicao": "meio", "espelhar": true}, "esperarTempo": 1000},
+    {"escreverMensagem": "Clebim:\nAh, que lindo dia na cidade de Townsville!"},
+    {"escreverMensagem": "Clebim:\nSeria uma pena se algo acont-"},
+    {"tocarSom": "sons.plem", "escreverMensagem": "KABOOOOOOOOOM!!!"},
+    {"mudarCenario": "imagensDeFundo.vilaDestruida", "mudarMusica": {"endereco": "musicas.teste", "volume": 70}, "esperarTempo": 2000},
+    {"escreverMensagem": "Clebim:\nMinha nossa! O que aconteceu? Está tudo destruído!"},
+    {"moverPersonagem": {"nome": "protagonista", "posicao": "esquerda", "espelhar": false}},
+    {"escreverMensagem": "Clebim:\nSó gente morta caída ao chão! Quem poderia ter feito isso?"},
+    {"moverPersonagem": {"nome": "protagonista", "posicao": "esquerda", "espelhar": true}},
+    {"adicionarPersonagem": {"nome": "irmão", "endereco": "personagens.irmao", "posicao": "direita"}, "esperarTempo": 1000},
+    {"escreverMensagem": "Clebim:\nCleitão?! O que você está fazendo aqui?"},
+    {"moverPersonagem": {"nome": "irmão", "espelhar": true}},
+    {"escreverMensagem": "Cleitão:\nHum?"},
+    {"removerPersonagem": "protagonista"},
+    {"esperarTempo": 500},
+    {"removerPersonagem": "irmão"}
+  ]
+}

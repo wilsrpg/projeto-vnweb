@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef } from "react";
-import { acoes, contexto } from "./Sistema";
-import plim from "../midias/som-confirmar2.ogg";
+import { contexto } from "../sistema/Contexto";
+import { acoes } from "../sistema/Redutor";
+import { sons } from "../mapeadoresDeArquivos/Sons";
 
 export default function Apresentacao() {
   const sistema = useContext(contexto);
@@ -21,11 +22,11 @@ export default function Apresentacao() {
     if(titulo){
       await sistema?.exibirElemento(titulo, 1500);
       if(pulou.current == false)
-        sistema?.despachar({tipo: acoes.tocarSom, endereco: plim});
+        sistema?.despachar({tipo: acoes.tocarSom, endereco: sons.plem});
       if(pulou.current == false)
         await new Promise((resolve) => setTimeout(() => resolve(""), 2000))
       if(pulou.current == false)
-        sistema?.despachar({tipo: acoes.tocarSom, endereco: plim});
+        sistema?.despachar({tipo: acoes.tocarSom, endereco: sons.plem});
       if(pulou.current == false)
         await sistema?.ocultarElemento(titulo, 1500);
       if(pulou.current == false)
@@ -36,8 +37,8 @@ export default function Apresentacao() {
   //pular apresentação
   useEffect(()=>{
     let e = sistema?.estado.eventoAtual;
-    if(sistema?.estado.msgsConsole.effects)
-      console.log("ef apresentação eventoAtual="+e)
+    //if(sistema?.estado.msgsConsole.effects)
+    //  console.log("ef apresentação eventoAtual="+e)
     if(e != undefined && e >= 0){
       pulou.current = true;
       if(sistema?.estado.msgsConsole.effects)

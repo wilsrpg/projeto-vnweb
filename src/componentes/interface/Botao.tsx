@@ -1,12 +1,14 @@
 import { useContext } from "react";
-import { acoes, contexto } from "./Sistema";
-import bip from "../midias/som-confirmar.ogg";
+import { contexto } from "../sistema/Contexto";
+import { sons } from "../mapeadoresDeArquivos/Sons";
+import { acoes } from "../sistema/Redutor";
 
 export default function Botao(prop:{
   nome: string,
   func: ()=>void,
   som?: string | {endereco: string, volume: number},
   id?: string,
+  title?: string,
   style?: object,
 }){
   const sistema = useContext(contexto);
@@ -15,6 +17,7 @@ export default function Botao(prop:{
     <input id={prop.id}
       type="button"
       value={prop.nome}
+      title={prop.title}
       onClick={(e)=>{
         e.stopPropagation();
         if(prop.som != undefined){
@@ -28,7 +31,7 @@ export default function Botao(prop:{
           }
           sistema?.despachar({tipo: acoes.tocarSom, endereco: endereco, numero1: volume});
         } else
-          sistema?.despachar({tipo: acoes.tocarSom, endereco: bip});
+          sistema?.despachar({tipo: acoes.tocarSom, endereco: sons.bip});
         prop.func();
       }}
       style={prop.style}

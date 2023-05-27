@@ -1,5 +1,6 @@
 import { useContext } from "react";
-import { acoes, contexto } from "./Sistema";
+import { acoes } from "../sistema/Redutor";
+import { contexto } from "../sistema/Contexto";
 
 export default function SeletorDeFonte(prop:{fontes: string[]}){
   const sistema = useContext(contexto);

@@ -1,137 +1,9 @@
-import { createContext, Dispatch } from "react";
-// import { roteiros } from "./mapeadores/Roteiros";
-// import { imagensDeFundo } from "./mapeadores/ImagensDeFundo";
-// import { musicas } from "./mapeadores/Musicas";
-// import { sons } from "./mapeadores/Sons";
-// import { personagens } from "./mapeadores/Personagens";
+import { estadoInicial, iVariaveis } from "./Contexto";
+import { Acao, personagem, salvo } from "./TiposDeObjetos";
 
-let msgsConsoleGeral = false;
-
-export const estadoInicial: iVariaveis = {
-  msgsConsole: {
-    renderizacoes: true && msgsConsoleGeral,
-    redutor: true && msgsConsoleGeral,
-    effects: true && msgsConsoleGeral,
-    roteiro: true && msgsConsoleGeral,
-    mouseTeclado: true && msgsConsoleGeral,
-  },
-  larguraTela: 640,
-  alturaTela: 480,
-  telaAtual: "apresentação",
-  imagemDeFundoAtual: "",
-  audioHabilitado: true,
-  volumeGeral: 50,
-  musicaAtual: null,
-  somParaTocar: null,
-  roteiroAtual: -1,
-  eventoAtual: -1,
-  jogoPausado: false,
-  aceitandoInteracao: true,
-  exibindoPainelInferior: false,
-  personagensNaTelaImg: [],
-  personagensNaTela: [],
-  personagemParaAdicionar: null,
-  personagemParaRemover: null,
-  removendoTodosOsPersonagens: false,
-  mensagemParaEscrever: "",
-  digitandoMensagem: false,
-  historicoDeMensagens: [],
-  exibindoTelaDeOpcoes: false,
-  exibindoTelaDoHistorico: false,
-  fonte: "Times New Roman",
-  corDaFonte: "#ffffff",
-  arquivoSalvoPraCarregar: null,
-  adicionandoPersonagensDoSalvo: false,
-};
-
-interface iVariaveis {
-  msgsConsole: {
-    renderizacoes: boolean,
-    redutor: boolean,
-    effects: boolean,
-    roteiro: boolean,
-    mouseTeclado: boolean,
-  },
-  larguraTela: number,
-  alturaTela: number,
-  telaAtual: string,
-  roteiroAtual: number,
-  eventoAtual: number,
-  jogoPausado: boolean,
-  aceitandoInteracao: boolean,
-  imagemDeFundoAtual: string,
-  audioHabilitado: boolean,
-  volumeGeral: number,
-  musicaAtual: {endereco: string, volume: number} | null,
-  somParaTocar: {endereco: string, volume: number} | null,
-  personagensNaTela: personagem[],
-  personagensNaTelaImg: HTMLImageElement[],
-  personagemParaAdicionar: personagem | null,
-  personagemParaRemover: string | null,
-  removendoTodosOsPersonagens: boolean,
-  exibindoPainelInferior: boolean,
-  mensagemParaEscrever: string,
-  digitandoMensagem: boolean,
-  historicoDeMensagens: string[],
-  exibindoTelaDeOpcoes: boolean,
-  exibindoTelaDoHistorico: boolean,
-  fonte: string,
-  corDaFonte: string,
-  arquivoSalvoPraCarregar: salvo | null,
-  adicionandoPersonagensDoSalvo: boolean,
-}
-
-export interface personagem {
-  nome: string,
-  endereco: string,
-  posicao?: string,
-  posX: number,
-  posY: number,
-  espelhado: boolean,
-}
-
-interface salvo {
-  roteiroAtual: number,
-  eventoAtual: number,
-  imagemDeFundoAtual: string,
-  audioHabilitado: boolean,
-  volumeGeral: number,
-  musicaAtual: {endereco: string, volume: number} | null,
-  personagensNaTela: personagem[],
-  mensagemParaEscrever: string,
-  digitandoMensagem: boolean,
-  historicoDeMensagens: string[],
-  fonte: string,
-  corDaFonte: string,
-}
-
-export interface evento {
-  escreverMensagem?: string,
-  adicionarPersonagem?: {nome: string, endereco: string, posicao?: string, posX?: number, posY?: number, espelhar?: boolean},
-  mudarSpritePersonagem?: {nome: string, endereco: string, espelhar?: boolean},
-  moverPersonagem?: {nome: string, posicao?: string, posX?: number, posY?: number, espelhar?: boolean},
-  //virarSprite?: {nome: string, espelhar: boolean},
-  removerPersonagem?: string,
-  mudarCenario?: string,
-  mudarMusica?: string | {endereco: string, volume?: number},
-  tocarSom?: string | {endereco: string, volume?: number},
-  esperarTempo?: number,
-  esperarInteracao?: boolean,
-}
-
-interface Acao {
-  tipo: acoes,
-  endereco?: string,
-  nome?: string,
-  numero1?: number,
-  numero2?: number,
-  string?: string,
-  opcao?: boolean
-};
-
-//funções para controlar as variáveis do sistema
 export enum acoes {
   mudarTela = "mudarTela",
+  definirDataDeInicio = "definirDataDeInicio",
   mudarRoteiro = "mudarRoteiro",
   mudarEvento = "mudarEvento",
   proximoEvento = "proximoEvento",
@@ -154,8 +26,10 @@ export enum acoes {
   limparHistorico = "limparHistorico",
   exibirTelaDoHistorico = "exibirTelaDoHistorico",
   exibirTelaDeOpcoes = "exibirTelaDeOpcoes",
+  exibirTelaDeArquivos = "exibirTelaDeArquivos",
   mudarFonte = "mudarFonte",
   mudarCorDaFonte = "mudarCorDaFonte",
+  mudarVelocidadeDoTexto = "mudarVelocidadeDoTexto",
   salvar = "salvar",
   carregar = "carregar",
   excluirSalvo = "excluirSalvo",
@@ -170,9 +44,12 @@ export function redutor(estado: iVariaveis, acao: Acao) {
   switch (acao.tipo) {
     case acoes.mudarTela:
       return { ...estado, telaAtual: acao.string! };
+      
+    case acoes.definirDataDeInicio:
+      return { ...estado, dataDeInicio: acao.numero1! };
 
-      case acoes.mudarRoteiro:
-        return { ...estado, roteiroAtual: acao.numero1! };
+    case acoes.mudarRoteiro:
+      return { ...estado, roteiroAtual: acao.numero1! };
 
     case acoes.mudarEvento:
       return { ...estado, eventoAtual: acao.numero1! };
@@ -332,30 +209,55 @@ export function redutor(estado: iVariaveis, acao: Acao) {
     case acoes.exibirTelaDeOpcoes:
       return { ...estado, exibindoTelaDeOpcoes: acao.opcao! };
 
+      case acoes.exibirTelaDeArquivos:
+        return { ...estado, exibindoTelaDeArquivos: acao.opcao! };
+  
     case acoes.mudarFonte:
       return { ...estado, fonte: acao.string! };
   
     case acoes.mudarCorDaFonte:
       return { ...estado, corDaFonte: acao.string! };
-    
+      
+    case acoes.mudarVelocidadeDoTexto:
+      return { ...estado, velocidadeDoTexto: acao.numero1! };
+
     case acoes.salvar:
-      let arquivo: salvo = {
-        roteiroAtual: estado.roteiroAtual,
-        eventoAtual: estado.eventoAtual,
-        imagemDeFundoAtual: estado.imagemDeFundoAtual,
-        audioHabilitado: estado.audioHabilitado,
-        volumeGeral: estado.volumeGeral,
-        musicaAtual: estado.musicaAtual,
-        personagensNaTela: estado.personagensNaTela,
-        mensagemParaEscrever: estado.mensagemParaEscrever,
-        digitandoMensagem: estado.digitandoMensagem,
-        historicoDeMensagens: estado.historicoDeMensagens,
-        fonte: estado.fonte,
-        corDaFonte: estado.corDaFonte,
-      };
-      localStorage.salvo = JSON.stringify(arquivo);
-      //console.log(JSON.parse(localStorage.salvo));
-      alert("O jogo foi salvo com sucesso.");
+      let salvar = false;
+      if (localStorage.length == 0){
+        salvar = true;
+      } else {
+        let arqSalvo = JSON.parse(localStorage.salvo);
+        //let dataIni = converterEmData(arqSalvo.dataDeInicio);
+        //let dataUlt = converterEmData(arqSalvo.ultimaVezQueSalvou);
+        //let tempoJogo = converterEmHoras(arqSalvo.ultimaVezQueSalvou - arqSalvo.dataDeInicio);
+        salvar = confirm("Sobrescrever o jogo salvo?"
+          +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
+          +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
+          +"\nTempo de jogo: "+converterEmHoras(arqSalvo.ultimaVezQueSalvou - arqSalvo.dataDeInicio)
+        );
+      }
+      if(salvar){
+        let arquivo: salvo = {
+          dataDeInicio: estado.dataDeInicio,
+          ultimaVezQueSalvou: Date.now(),
+          roteiroAtual: estado.roteiroAtual,
+          eventoAtual: estado.eventoAtual,
+          imagemDeFundoAtual: estado.imagemDeFundoAtual,
+          audioHabilitado: estado.audioHabilitado,
+          volumeGeral: estado.volumeGeral,
+          musicaAtual: estado.musicaAtual,
+          personagensNaTela: estado.personagensNaTela,
+          mensagemParaEscrever: estado.mensagemParaEscrever,
+          digitandoMensagem: estado.digitandoMensagem,
+          historicoDeMensagens: estado.historicoDeMensagens,
+          fonte: estado.fonte,
+          corDaFonte: estado.corDaFonte,
+          velocidadeDoTexto: estado.velocidadeDoTexto,
+        };
+        localStorage.salvo = JSON.stringify(arquivo);
+        //console.log(JSON.parse(localStorage.salvo));
+        alert("O jogo foi salvo com sucesso.");
+      }
       return { ...estado };
       
     case acoes.carregar:
@@ -366,13 +268,33 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         return { ...estado };
       } else {
         //console.log(JSON.parse(localStorage.salvo));
-        return { ...estado, mensagemParaEscrever: "", arquivoSalvoPraCarregar: JSON.parse(localStorage.salvo) };
+        let arqSalvo = JSON.parse(localStorage.salvo);
+        let carregar = confirm("Carregar o jogo salvo?"
+          +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
+          +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
+          +"\nTempo de jogo: "+converterEmHoras(arqSalvo.ultimaVezQueSalvou - arqSalvo.dataDeInicio)
+        );
+        if(carregar)
+          return { ...estado, mensagemParaEscrever: "", arquivoSalvoPraCarregar: JSON.parse(localStorage.salvo) };
+        else
+          return { ...estado };
       }
   
     case acoes.excluirSalvo:
-      localStorage.removeItem("salvo");
-      alert("O jogo foi excluído com sucesso.");
-      //console.log(localStorage);
+      if (localStorage.length == 0){
+        alert("Não há jogo salvo.");
+      } else {
+        let arqSalvo = JSON.parse(localStorage.salvo);
+        let excluir = confirm("Excluir o jogo salvo?"
+          +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
+          +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
+          +"\nTempo de jogo: "+converterEmHoras(arqSalvo.ultimaVezQueSalvou - arqSalvo.dataDeInicio)
+        );
+        if(excluir){
+          localStorage.removeItem("salvo");
+          alert("O jogo foi excluído com sucesso.");
+        }
+      }
       return { ...estado };
   
     case acoes.adicionarPersonagensDoSalvo:
@@ -388,12 +310,22 @@ export function redutor(estado: iVariaveis, acao: Acao) {
   }
 }
 
-interface iContexto {
-  estado: iVariaveis,
-  despachar: Dispatch<Acao>,
-  exibirElemento(elem: HTMLElement, tempo?: number, opacFinal?: number): Promise<Animation>,
-  ocultarElemento(elem: HTMLElement, tempo?: number): Promise<Animation>,
-  voltarParaTelaInicial(): void,
+function converterEmData(t: number) {
+  let data = new Date(t);
+  let dataStr = (data.getDate()<10?"0":"")+data.getDate()
+    +"/"+(1+data.getMonth()<10?"0":"")+(1+data.getMonth())
+    +"/"+data.getFullYear()
+    +" "+(data.getHours()<10?"0":"")+data.getHours()
+    +":"+(data.getMinutes()<10?"0":"")+data.getMinutes()
+    +":"+(data.getSeconds()<10?"0":"")+data.getSeconds();
+  return dataStr;
 }
 
-export const contexto = createContext<iContexto | null>(null);
+function converterEmHoras(t: number) {
+  let segundos = Math.floor(t)/1000;
+  let horJogo = Number(Math.floor(segundos/3600).toFixed(0));
+  let minJogo = Number((Math.floor(segundos/60)%60).toFixed(0));
+  let segJogo = Number((segundos%60).toFixed(0));
+  let tmpJgStr = horJogo+":"+(minJogo<10?"0":"")+minJogo+":"+(segJogo<10?"0":"")+segJogo;
+  return tmpJgStr;
+}

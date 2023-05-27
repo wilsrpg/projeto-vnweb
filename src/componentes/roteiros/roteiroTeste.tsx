@@ -1,29 +1,27 @@
-import { evento } from "../Sistema";
-import bgiVilaDestruida from "../../midias/bgi-viladestruida.png";
-import bgmIrmao from "../../midias/bgm-teste.ogg";
-import protagonista from "../../midias/p1tiny.png";
-import irmao from "../../midias/p2tiny.png";
-import protagonista2 from "../../midias/conceito-MCtiny.png";
-import irmao2 from "../../midias/conceito-Villaintiny.png";
+import { imagensDeFundo } from "../mapeadoresDeArquivos/ImagensDeFundo";
+import { musicas } from "../mapeadoresDeArquivos/Musicas";
+import { sons } from "../mapeadoresDeArquivos/Sons";
+import { personagens } from "../mapeadoresDeArquivos/Personagens";
+import { evento } from "../sistema/TiposDeObjetos";
 
-export const roteiro: evento[] = [
-  {mudarCenario: bgiVilaDestruida, mudarMusica: bgmIrmao, esperarTempo: 1000},
-  {adicionarPersonagem: {nome: "irmão", endereco: irmao, posicao: "esquerda"}},
-  {adicionarPersonagem: {nome: "protagonista", endereco: protagonista, posicao: "direita", espelhar: true}},
+export let roteiro: evento[] = [
+  {mudarCenario: imagensDeFundo.vilaDestruida, mudarMusica: musicas.teste, esperarTempo: 1000},
+  {adicionarPersonagem: {nome: "irmão", endereco: personagens.irmao, posicao: "esquerda"}},
+  {adicionarPersonagem: {nome: "protagonista", endereco: personagens.protagonista, posicao: "direita", espelhar: true}},
   {esperarTempo: 1000},
   {escreverMensagem: "Cleitão:\nEi, baitola."},
-  {mudarSpritePersonagem: {nome: "protagonista", endereco: protagonista2, espelhar: true}},
+  {mudarSpritePersonagem: {nome: "protagonista", endereco: personagens.conceito_protagonista, espelhar: true}},
   {escreverMensagem: "Clebim:\nÉ o quê?!"},
   {escreverMensagem: "Cleitão:\nTu mermo, baitola."},
   {moverPersonagem: {nome: "protagonista", posicao: "meio"}},
   {escreverMensagem: "Clebim:\nOrsh!"},
-  {mudarSpritePersonagem: {nome: "irmão", endereco: irmao2}},
+  {mudarSpritePersonagem: {nome: "irmão", endereco: personagens.conceito_irmao}},
   {escreverMensagem: "Cleitão:\nOsh o quê?"},
   {moverPersonagem: {nome: "protagonista", espelhar: false}, esperarTempo: 600},
   {moverPersonagem: {nome: "protagonista", espelhar: true}, esperarTempo: 600},
   {moverPersonagem: {nome: "protagonista", espelhar: false}, esperarTempo: 600},
   {moverPersonagem: {nome: "protagonista", espelhar: true}, esperarTempo: 600},
-  {escreverMensagem: "Clebim:\nComo cê percebeu que eu sou gay? ;)"},
+  {tocarSom: sons.plem, escreverMensagem: "Clebim:\nComo cê percebeu que eu sou gay? ;)"},
   {removerPersonagem: "protagonista"},
   {removerPersonagem: "irmão"},
 ]

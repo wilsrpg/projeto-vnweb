@@ -4,7 +4,7 @@ import bgmIdk from "../../midias/bgm-idk.ogg";
 
 //todas os sons devem constar neste objeto para serem acessíveis a todas
 //as cenas
-export const musicas = {
+export const musicas: Record<string, string> = {
   titulo: bgmTitulo,
   teste: bgmTeste,
   idk: bgmIdk,

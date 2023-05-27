@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { contexto } from "./Sistema";
+import { contexto } from "../sistema/Contexto";
 import CaixaDeBotoes from "./CaixaDeBotoes";
 import CaixaDeDialogo from "./CaixaDeDialogo";
 
@@ -21,7 +21,9 @@ export default function PainelInferior(){
       }}
     >
       <CaixaDeDialogo largura="85%"/>
-      <CaixaDeBotoes largura="15%"/>
+      {!sistema?.estado.exibindoTelaDeOpcoes && !sistema?.estado.exibindoTelaDoHistorico &&
+        <CaixaDeBotoes largura="15%"/>
+      }
     </div>
   )
 }

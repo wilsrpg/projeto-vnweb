@@ -1,7 +1,8 @@
 import React, { useEffect, useReducer } from "react";
-import { acoes, contexto, estadoInicial, redutor } from "./Sistema";
+import { contexto, estadoInicial } from "./Contexto";
 import Grafico from "./Grafico";
 import Som from "./Som";
+import { acoes, redutor } from "./Redutor";
 
 export default function Jogo() {
   const [estado, despachar] = useReducer(redutor, estadoInicial);
@@ -36,6 +37,7 @@ export default function Jogo() {
     despachar({tipo: acoes.mudarMusica, endereco: arquivo.musicaAtual.endereco, numero1: arquivo.musicaAtual.volume});
     despachar({tipo: acoes.mudarFonte, string: arquivo.fonte});
     despachar({tipo: acoes.mudarCorDaFonte, string: arquivo.corDaFonte});
+    despachar({tipo: acoes.mudarVelocidadeDoTexto, numero1: arquivo.velocidadeDoTexto});
     despachar({tipo: acoes.limparHistorico});
     arquivo.historicoDeMensagens.map((msg: string, i: number)=>{
       if(i < arquivo.historicoDeMensagens.length-1 || arquivo.digitandoMensagem)
@@ -68,6 +70,7 @@ export default function Jogo() {
     despachar({tipo: acoes.removerTodosOsPersonagens});
     despachar({tipo: acoes.limparHistorico});
     despachar({tipo: acoes.escreverMensagem, string: ""});
+    despachar({tipo: acoes.exibirPainelInferior, opcao: false});
     despachar({tipo: acoes.mudarTela, string: "menu inicial"});
   }
 

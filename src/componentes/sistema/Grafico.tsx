@@ -1,11 +1,14 @@
 import { useContext, useEffect, useRef } from "react";
-import { acoes, contexto, estadoInicial, personagem } from "./Sistema";
-import Apresentacao from "./Apresentacao";
-import TelaInicial from "./TelaInicial";
-import EmJogo from "./EmJogo";
-import PainelInferior from "./PainelInferior";
-import TelaDeOpcoes from "./TelaDeOpcoes";
-import TelaDoHistorico from "./TelaDoHistorico";
+import { contexto, estadoInicial } from "./Contexto";
+import Apresentacao from "../telas/Apresentacao";
+import TelaInicial from "../telas/TelaInicial";
+import EmJogo from "../telas/EmJogo";
+import PainelInferior from "../interface/PainelInferior";
+import TelaDeOpcoes from "../telas/TelaDeOpcoes";
+import TelaDoHistorico from "../telas/TelaDoHistorico";
+import { acoes } from "./Redutor";
+import { personagem } from "./TiposDeObjetos";
+import TelaDeArquivos from "../telas/TelaDeArquivos";
 
 export default function Grafico(){
   const sistema = useContext(contexto);
@@ -188,7 +191,7 @@ export default function Grafico(){
           position: "absolute",
           top: "0",
           width: "100%",
-          height: "100%",
+          //height: "100%",
           display: "block",
         }}
       />
@@ -203,10 +206,13 @@ export default function Grafico(){
       {sistema?.estado.telaAtual == "apresentação" ? <Apresentacao/> : ""}
       {sistema?.estado.telaAtual == "menu inicial" ? <TelaInicial/> : ""}
       {sistema?.estado.telaAtual == "jogo" ? <EmJogo/> : ""}
+      {/*{sistema?.estado.telaAtual == "opções" ? <TelaDeOpcoes/> : ""}*/}
+      {/*{sistema?.estado.telaAtual == "arquivos" ? <TelaDeArquivos/> : ""}*/}
       
       {sistema?.estado.exibindoPainelInferior && <PainelInferior/>}
       {sistema?.estado.exibindoTelaDeOpcoes && <TelaDeOpcoes/>}
       {sistema?.estado.exibindoTelaDoHistorico && <TelaDoHistorico/>}
+      {sistema?.estado.exibindoTelaDeArquivos && <TelaDeArquivos/>}
     </div>
   )
 }

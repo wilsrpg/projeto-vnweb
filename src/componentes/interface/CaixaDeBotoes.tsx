@@ -1,5 +1,6 @@
 import { useContext } from "react";
-import { acoes, contexto } from "./Sistema";
+import { acoes } from "../sistema/Redutor";
+import { contexto } from "../sistema/Contexto";
 import Botao from "./Botao";
 
 export default function CaixaDeBotoes(prop:{largura: string}){
@@ -30,6 +31,7 @@ export default function CaixaDeBotoes(prop:{largura: string}){
       <Botao nome="nada" func={()=>{}}/>
       <Botao nome="Histórico" func={()=>sistema?.despachar({tipo: acoes.exibirTelaDoHistorico, opcao: true})}/>
       <Botao nome="Opções" func={()=>sistema?.despachar({tipo: acoes.exibirTelaDeOpcoes, opcao: true})}/>
+      {/*<Botao nome="Opções" func={()=>sistema?.despachar({tipo: acoes.mudarTela, string: "opções"})}/>*/}
       <Botao nome="Voltar" func={()=>{sistema?.voltarParaTelaInicial()}}/>
     </div>
   )
