@@ -136,8 +136,9 @@ export default function TelaDeArquivos(){
   function obterEndereco(v: string){
     let tipo = v.slice(0, v.search("\\."));
     let midia = v.slice(v.search("\\.")+1);
-    imagensDeFundo;sons;personagens;musicas; //se tirar algum desses e um arquivo referenciar ele, vai dar erro qd entrar no eval, n sei pq
-    return eval(tipo+"."+midia);
+    let arraysDeArquivos = {imagensDeFundo,personagens,musicas,sons};
+    let array = tipo as keyof typeof arraysDeArquivos;
+    return arraysDeArquivos[array][midia];
   }
 
   return (
