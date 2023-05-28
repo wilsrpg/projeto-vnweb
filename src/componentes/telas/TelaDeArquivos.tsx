@@ -1,10 +1,10 @@
 import { useContext, useEffect, useRef, useState } from "react"
 import { contexto } from "../sistema/Contexto";
 import Botao from "../interface/Botao";
-import { imagensDeFundo } from "../mapeadoresDeArquivos/ImagensDeFundo";
-import { musicas } from "../mapeadoresDeArquivos/Musicas";
-import { sons } from "../mapeadoresDeArquivos/Sons";
-import { personagens } from "../mapeadoresDeArquivos/Personagens";
+import { imagensDeFundo } from "../mapeadores/ImagensDeFundo";
+import { musicas } from "../mapeadores/Musicas";
+import { sons } from "../mapeadores/Sons";
+import { personagens } from "../mapeadores/Personagens";
 import { acoes } from "../sistema/Redutor";
 import { roteiros } from "../roteiros/ListaDeRoteiros";
 import GerenciadorDeArquivos from "../interface/GerenciadorDeArquivos";
@@ -132,21 +132,12 @@ export default function TelaDeArquivos(){
         sistema?.despachar({tipo: acoes.mudarImagemDeFundo, endereco: leitor.result});
     }*/
   }
-  
+
   function obterEndereco(v: string){
     let tipo = v.slice(0, v.search("\\."));
     let midia = v.slice(v.search("\\.")+1);
     imagensDeFundo;sons;personagens;musicas; //se tirar algum desses e um arquivo referenciar ele, vai dar erro qd entrar no eval, n sei pq
     return eval(tipo+"."+midia);
-  }
-
-  function camelCaseAlfanumerico(s: string) {
-    let ss = s.split(RegExp("\\W","g"));
-    ss.map((palavra,i)=>{
-      if(i>0)
-        ss[i] = palavra[0].toUpperCase()+palavra.slice(1);
-    });
-    return ss.join("");
   }
 
   return (

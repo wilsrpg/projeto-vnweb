@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { acoes } from "../sistema/Redutor";
 import { contexto } from "../sistema/Contexto";
-import { imagensDeFundo } from "../mapeadoresDeArquivos/ImagensDeFundo";
-import { musicas } from "../mapeadoresDeArquivos/Musicas";
-import { sons } from "../mapeadoresDeArquivos/Sons";
+import { imagensDeFundo } from "../mapeadores/ImagensDeFundo";
+import { musicas } from "../mapeadores/Musicas";
+import { sons } from "../mapeadores/Sons";
 import Botao from "../interface/Botao";
 
 export default function TelaInicial() {

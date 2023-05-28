@@ -1,7 +1,7 @@
-import { imagensDeFundo } from "../mapeadoresDeArquivos/ImagensDeFundo";
-import { musicas } from "../mapeadoresDeArquivos/Musicas";
-import { sons } from "../mapeadoresDeArquivos/Sons";
-import { personagens } from "../mapeadoresDeArquivos/Personagens";
+import { imagensDeFundo } from "../mapeadores/ImagensDeFundo";
+import { musicas } from "../mapeadores/Musicas";
+import { sons } from "../mapeadores/Sons";
+import { personagens } from "../mapeadores/Personagens";
 import { evento } from "../sistema/TiposDeObjetos";
 
 export const roteiro: evento[] = [

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from "react";
 import { contexto } from "../sistema/Contexto";
 import { acoes } from "../sistema/Redutor";
-import { sons } from "../mapeadoresDeArquivos/Sons";
+import { sons } from "../mapeadores/Sons";
 
 export default function Apresentacao() {
   const sistema = useContext(contexto);
