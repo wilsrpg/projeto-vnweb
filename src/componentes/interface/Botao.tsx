@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { contexto } from "../sistema/Contexto";
-import { sons } from "../mapeadoresDeArquivos/Sons";
+import { sons } from "../mapeadores/Sons";
 import { acoes } from "../sistema/Redutor";
 
 export default function Botao(prop:{

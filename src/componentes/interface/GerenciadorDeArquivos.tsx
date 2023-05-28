@@ -1,10 +1,10 @@
 import { useContext, useEffect, useRef, useState } from "react"
 import { contexto } from "../sistema/Contexto";
 import Botao from "./Botao";
-import { imagensDeFundo } from "../mapeadoresDeArquivos/ImagensDeFundo";
-import { musicas } from "../mapeadoresDeArquivos/Musicas";
-import { sons } from "../mapeadoresDeArquivos/Sons";
-import { personagens } from "../mapeadoresDeArquivos/Personagens";
+import { imagensDeFundo } from "../mapeadores/ImagensDeFundo";
+import { musicas } from "../mapeadores/Musicas";
+import { sons } from "../mapeadores/Sons";
+import { personagens } from "../mapeadores/Personagens";
 import { acoes } from "../sistema/Redutor";
 
 export default function GerenciadorDeArquivos(prop:{
