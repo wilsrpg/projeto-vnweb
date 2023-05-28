@@ -1,6 +1,7 @@
 {
   "name": "vnweb",
   "private": true,
+  "homepage": "/projeto-vnweb",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
