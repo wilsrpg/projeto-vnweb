@@ -65,7 +65,10 @@ export default function TelaInicial() {
     let midia = v.slice(v.search("\\.")+1);
     let arraysDeArquivos = {imagensDeFundo,personagens,musicas,sons};
     let array = tipo as keyof typeof arraysDeArquivos;
-    return arraysDeArquivos[array][midia];
+    if(arraysDeArquivos[array][midia])
+      return arraysDeArquivos[array][midia];
+    else
+      throw new Error("Arquivo '"+v+"' não encontrado.");
   }
 
   function menuNovoJogo(){

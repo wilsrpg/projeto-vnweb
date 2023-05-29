@@ -62,6 +62,10 @@ export default function EmJogo() {
         sistema?.despachar({tipo: acoes.mudarImagemDeFundo, endereco: bgi});
       }
       
+      if(roteiro[i].removerCenario){
+        sistema?.despachar({tipo: acoes.mudarImagemDeFundo, endereco: ""});
+      }
+
       if(roteiro[i].mudarMusica){
         let bgm = roteiro[i].mudarMusica;
         if(sistema?.estado.msgsConsole.roteiro){
@@ -81,7 +85,11 @@ export default function EmJogo() {
         }
         sistema?.despachar({tipo: acoes.mudarMusica, endereco: endereco, numero1: volume});
       }
-      
+
+      if(roteiro[i].pararMusica){
+        sistema?.despachar({tipo: acoes.mudarMusica, endereco: ""});
+      }
+
       if(roteiro[i].tocarSom){
         let som = roteiro[i].tocarSom;
         if(sistema?.estado.msgsConsole.roteiro){
@@ -132,6 +140,25 @@ export default function EmJogo() {
         let posX = roteiro[i].moverPersonagem?.posX;
         let posY = roteiro[i].moverPersonagem?.posY;
         sistema.despachar({tipo: acoes.moverPersonagem, nome: nome, string: posicao, numero1: posX, numero2: posY, opcao: espelhar});
+      }
+      
+      if(roteiro[i].virarSpritePersonagem){
+        let pers = roteiro[i].virarSpritePersonagem;
+        if(sistema?.estado.msgsConsole.roteiro){
+          if(typeof pers == "string")
+            console.log("virando personagem="+pers);
+          else if(typeof pers == "object")
+            console.log("virando personagem="+pers.nome);
+        }
+        let nome = "";
+        let espelhar: boolean | undefined;
+        if(typeof pers == "string")
+          nome = pers;
+        else if(typeof pers == "object"){
+          nome = pers.nome;
+          espelhar = pers.espelhar;
+        }
+        sistema?.despachar({tipo: acoes.virarPersonagem, nome: nome, opcao: espelhar});
       }
 
       if(roteiro[i].removerPersonagem){
