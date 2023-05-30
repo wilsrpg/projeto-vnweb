@@ -12,11 +12,12 @@ export enum acoes {
   mudarImagemDeFundo = "mudarImagemDeFundo",
   alternarAudio = "alternarAudio",
   mudarVolume = "mudarVolume",
-  mudarMusica = "mudarMusica",
+  tocarMusica = "tocarMusica",
   tocarSom = "tocarSom",
   adicionarPersonagem = "adicionarPersonagem",
   mudarSpritePersonagem = "mudarSprite",
   moverPersonagem = "moverPersonagem",
+  virarPersonagem = "virarPersonagem",
   removerPersonagem = "removerPersonagem",
   removerTodosOsPersonagens = "removerTodosOsPersonagens",
   exibirPainelInferior = "exibirPainelInferior",
@@ -64,6 +65,8 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       return { ...estado, jogoPausado: acao.opcao! };
     
     case acoes.mudarImagemDeFundo:
+      if(!acao.endereco)
+        return { ...estado, imagemDeFundoAtual: "" };
       return { ...estado, imagemDeFundoAtual: acao.endereco! };
 
     case acoes.alternarAudio:
@@ -72,7 +75,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
     case acoes.mudarVolume:
       return { ...estado, volumeGeral: acao.numero1! };
 
-    case acoes.mudarMusica:
+    case acoes.tocarMusica:
       if(!acao.endereco)
         return { ...estado, musicaAtual: null };
       let volumeMusica = 100;
@@ -176,6 +179,27 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       
       return { ...estado, personagemParaRemover: persMov.nome, personagemParaAdicionar: persMov };
 
+    case acoes.virarPersonagem:
+      if(!acao.nome)
+        return { ...estado };
+      
+      let persVir: personagem;
+      let idVir = -1;
+      estado.personagensNaTela.map((pers,i)=>{
+        if(acao.nome && pers.nome == acao.nome)
+          idVir = i;
+      })
+      //console.log("movendo pers "+acao.nome+", id="+idMov);
+      //console.log("nome="+estado.personagensNaTela[idMov].nome);
+      persVir = estado.personagensNaTela[idVir];
+
+      if(acao.opcao != undefined)
+        persVir.espelhado = acao.opcao;
+      else
+        persVir.espelhado = !persVir.espelhado;
+      
+      return { ...estado, personagemParaRemover: persVir.nome, personagemParaAdicionar: persVir };
+  
     case acoes.removerPersonagem:
       if(!acao.nome)
         return { ...estado, personagemParaRemover: null };

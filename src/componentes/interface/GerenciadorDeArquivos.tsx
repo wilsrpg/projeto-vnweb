@@ -1,17 +1,16 @@
 import { useContext, useEffect, useRef, useState } from "react"
 import { contexto } from "../sistema/Contexto";
+import { acoes } from "../sistema/Redutor";
 import Botao from "./Botao";
 import { imagensDeFundo } from "../mapeadores/ImagensDeFundo";
+import { personagens } from "../mapeadores/Personagens";
 import { musicas } from "../mapeadores/Musicas";
 import { sons } from "../mapeadores/Sons";
-import { personagens } from "../mapeadores/Personagens";
-import { acoes } from "../sistema/Redutor";
 
 export default function GerenciadorDeArquivos(prop:{
   titulo: string,
   tipo: string,
   accept: string,
-  //arrayDosArquivos: Record<string, string>,
   nomeDoObjetoDestinoDosArquivos: string,
   acaoDoDespache?: acoes,
 }){
@@ -20,33 +19,23 @@ export default function GerenciadorDeArquivos(prop:{
   const [arquivos,definirArquivos] = useState<FileList>();
   const [arquivosPraAdicionarStt,definirArquivosPraAdicionarStt] = useState<{nome:string, endereco:string}[]>([]);
   const arquivosPraAdicionarRef = useRef<{nome:string, endereco:string}[]>([]);
+  let arrays = {imagensDeFundo,personagens,musicas,sons};
+  let array = prop.nomeDoObjetoDestinoDosArquivos as keyof typeof arrays;
   if(sistema?.estado.msgsConsole.renderizacoes)
     console.log("renderizou gerenciador de arquivos");
-  imagensDeFundo;sons;personagens;musicas; //se tirar algum desses e um arquivo referenciar ele, vai dar erro qd entrar no eval, n sei pq
-  const arrayArqs: Record<string,string> = eval(prop.nomeDoObjetoDestinoDosArquivos);
 
   useEffect(()=>{
-    //console.log("ef arquivos");
+    if(sistema?.estado.msgsConsole.effects)
+      console.log("ef gerenciador de arquivos");
     if(arquivos?.length){
-      //console.log("ef arquivos, length="+arquivos?.length);
-      add();
-      //addArqs(arquivos)
-      //.then(()=>{
-      //  definirArquivosPraAdicionarStt(arquivosPraAdicionarRef.current);
-      //  definirArquivos(undefined);
-      //})
+      adicionarArquivos(arquivos)
+      .then(()=>{
+        definirArquivosPraAdicionarStt(arquivosPraAdicionarRef.current);
+        definirArquivos(undefined);})
     }
   }, [arquivos]);
 
-  async function add() {
-    //console.log("entrou add");
-    await addArqs(arquivos);
-    //console.log("em add, terminou addArqs, spa2 ref length="+arquivosPraAdicionarRef.current.length);
-    definirArquivosPraAdicionarStt(arquivosPraAdicionarRef.current);
-    definirArquivos(undefined);
-  }
-
-  async function addArqs(listaArqs: FileList | undefined, i = 0) {
+  async function adicionarArquivos(listaArqs: FileList | undefined, i = 0) {
     if(listaArqs){
       leitorDeArquivos.readAsDataURL(listaArqs[i]);
       await new Promise((r)=>leitorDeArquivos.addEventListener("load",r))
@@ -54,14 +43,14 @@ export default function GerenciadorDeArquivos(prop:{
         arquivosPraAdicionarRef.current.push({nome:listaArqs[i].name, endereco:leitorDeArquivos.result});
       i++;
       if(i < listaArqs?.length)
-        await addArqs(listaArqs,i);
+        await adicionarArquivos(listaArqs,i);
     }
   }
 
   function passarPraLowerCamelCaseAlfanumerico(s: string) {
     let ss = s.split(RegExp("\\W","g"));
     ss.map((palavra,i)=>{
-      if(i>0)
+      if(i>0 && palavra.length>0)
         ss[i] = palavra[0].toUpperCase()+palavra.slice(1);
     });
     return ss.join("");
@@ -86,17 +75,11 @@ export default function GerenciadorDeArquivos(prop:{
       id={"adicionar "+prop.nomeDoObjetoDestinoDosArquivos}
       style={{display: "none"}}
       onChange={(e)=>{
-        //console.log("file onchange");
-        //let arqElem = document.getElementById("adicionar "+prop.nomeDoArrayDosArquivos);
-        //if(arqElem && arqElem instanceof HTMLInputElement && arqElem.files){
-        //  console.log("definiu arquivos, length="+arqElem.files.length);
-        //  definirArquivos(arqElem.files);
-        //}
         if(e.target.files)
           definirArquivos(e.target.files);
       }}
     />
-    {Object.entries(arrayArqs).map(([nome,endereco],k)=>
+    {Object.entries(arrays[array]).map(([nome,endereco],k)=>
     <div key={k*2}>
       {prop.tipo == "imagem" &&
         <img src={endereco} height="20" style={{marginRight: "1%", border: "solid 1px white"}}/>
@@ -116,7 +99,7 @@ export default function GerenciadorDeArquivos(prop:{
         som=""
         style={{marginLeft: "1%"}}
         func={()=>{
-          delete arrayArqs[nome];
+          delete arrays[array][nome];
         }}
       />
     </div>
@@ -137,10 +120,11 @@ export default function GerenciadorDeArquivos(prop:{
         />
       }
       <span>{prop.nomeDoObjetoDestinoDosArquivos}.</span>
-      <input type="text" pattern="\\w*"
+      <input type="text"// pattern="\\w*"
         id={"nome"+k}
         className="nome"
-        defaultValue={(passarPraLowerCamelCaseAlfanumerico(nome.slice(0,nome.lastIndexOf("."))))} //remove extensão ants d chamar a função
+        maxLength={32}
+        defaultValue={(passarPraLowerCamelCaseAlfanumerico(nome.slice(0,nome.lastIndexOf(".")))).slice(0,32)} //remove extensão ants d chamar a função
         style={{border: "solid 1px white"}}
         onChange={(e)=>e.target.style.borderColor = "white"}
       />
@@ -148,35 +132,50 @@ export default function GerenciadorDeArquivos(prop:{
         som=""
         style={{marginLeft: "1%"}}
         func={()=>{
-          let nomeArq = passarPraLowerCamelCaseAlfanumerico(nome.slice(0,nome.lastIndexOf(".")));
+          let nomeArq = "";
+          let nomeInvalido = false;
           let campo = document.getElementById("nome"+k);
-          if(campo && campo instanceof HTMLInputElement)
-            nomeArq = campo.value;
-          let jaExiste = false;
-          let nomes = Object.keys(arrayArqs);
-          //if(prop.arrayDosArquivos instanceof Object)
-            //Object.keys(prop.arrayDosArquivos);
-          nomes.map((n)=>{
-            if(n == nomeArq){
-              jaExiste = true;
-              return;
+          if(campo && campo instanceof HTMLInputElement){
+            if(!campo.value){
+              nomeInvalido = true;
+              alert("Digite um nome para o arquivo.");
+            } else {
+              let caracInvalido = campo.value.search("\\W");
+              if(caracInvalido>=0){
+                nomeInvalido = true;
+                console.log("caractere inválido na posição "+caracInvalido+": "+campo.value[caracInvalido]);
+                alert("O nome do arquivo só pode conter letras maiúsculas e minúsculas, números e sublinhado.");
+              } else
+                nomeArq = campo.value;
             }
-          });
-          if(jaExiste){
-            if(campo) campo.style.borderColor = "red";
+          }
+          if(!nomeArq){
+            nomeInvalido = true;
           } else {
-            //console.log(musicas);
-            //if(campo) campo.style.borderColor = "white";
-            arrayArqs[nomeArq] = arquivosPraAdicionarRef.current[k].endereco;
-            
-            for(let i=k; i<arquivosPraAdicionarStt.length-1; i++){ //do próximo ao penúltimo
+            let nomes = Object.keys(arrays[array]);
+            nomes.map((n)=>{
+              if(n == nomeArq){
+                nomeInvalido = true;
+                alert("Já existe um arquivo com este nome. Digite um nome diferente.");
+                return;
+              }
+            });
+          }
+          if(nomeInvalido){
+            if(campo){
+              campo.style.borderColor = "red";
+              campo.focus();
+            }
+          } else {
+            arrays[array][nomeArq] = arquivosPraAdicionarRef.current[k].endereco;
+            for(let i=k; i<arquivosPraAdicionarStt.length-1; i++){
               let campos = document.getElementsByClassName("nome");
               let campoAtual = campos[i];
               let proximoCampo = campos[i+1];
               if(campoAtual instanceof HTMLInputElement && proximoCampo instanceof HTMLInputElement)
                 campoAtual.value = proximoCampo.value;
             }
-            arquivosPraAdicionarRef.current = arquivosPraAdicionarRef.current.filter((v,i)=>{return i!=k});
+            arquivosPraAdicionarRef.current = arquivosPraAdicionarRef.current.filter((v,i)=>{return i != k});
             definirArquivosPraAdicionarStt(arquivosPraAdicionarRef.current);
           }
         }}
@@ -185,7 +184,7 @@ export default function GerenciadorDeArquivos(prop:{
         som=""
         style={{marginLeft: "1%"}}
         func={()=>{
-          for(let i=k; i<arquivosPraAdicionarStt.length-1; i++){ //do próximo ao penúltimo
+          for(let i=k; i<arquivosPraAdicionarStt.length-1; i++){
             let campos = document.getElementsByClassName("nome");
             let campoAtual = campos[i];
             let proximoCampo = campos[i+1];

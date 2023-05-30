@@ -34,7 +34,7 @@ export default function Jogo() {
     if(estado.audioHabilitado != arquivo.audioHabilitado)
       despachar({tipo: acoes.alternarAudio});
     despachar({tipo: acoes.mudarVolume, numero1: arquivo.volumeGeral});
-    despachar({tipo: acoes.mudarMusica, endereco: arquivo.musicaAtual.endereco, numero1: arquivo.musicaAtual.volume});
+    despachar({tipo: acoes.tocarMusica, endereco: arquivo.musicaAtual.endereco, numero1: arquivo.musicaAtual.volume});
     despachar({tipo: acoes.mudarFonte, string: arquivo.fonte});
     despachar({tipo: acoes.mudarCorDaFonte, string: arquivo.corDaFonte});
     despachar({tipo: acoes.mudarVelocidadeDoTexto, numero1: arquivo.velocidadeDoTexto});
