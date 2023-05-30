@@ -49,7 +49,7 @@ export default function TelaDeArquivos(){
           tipo="áudio"
           accept=".ogg"
           nomeDoObjetoDestinoDosArquivos="musicas"
-          acaoDoDespache={acoes.mudarMusica}
+          acaoDoDespache={acoes.tocarMusica}
         />
         <GerenciadorDeArquivos
           titulo="Efeitos de som"
@@ -60,7 +60,7 @@ export default function TelaDeArquivos(){
         />
       </div>
 
-      <Botao nome="Parar música" func={()=>sistema?.despachar({tipo: acoes.mudarMusica, endereco: ""})}
+      <Botao nome="Parar música" func={()=>sistema?.despachar({tipo: acoes.tocarMusica, endereco: ""})}
         style={{
           position: "absolute",
           left: "1%",
@@ -73,7 +73,7 @@ export default function TelaDeArquivos(){
         func={()=>{
           sistema?.despachar({tipo: acoes.exibirTelaDeArquivos, opcao: false});
           if(sistema?.estado.musicaAtual?.endereco != musicas.idk && sistema?.estado.musicaAtual?.volume != 50)
-            sistema?.despachar({tipo: acoes.mudarMusica, endereco: musicas.idk, numero1: 50});
+            sistema?.despachar({tipo: acoes.tocarMusica, endereco: musicas.idk, numero1: 50});
         }}
         style={{
           position: "absolute",

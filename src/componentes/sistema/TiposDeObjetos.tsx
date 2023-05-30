@@ -10,15 +10,6 @@ export interface Acao {
   opcao?: boolean
 };
 
-export interface personagem {
-  nome: string,
-  endereco: string,
-  posicao?: string,
-  posX: number,
-  posY: number,
-  espelhado: boolean,
-}
-
 export interface salvo {
   dataDeInicio: number,
   ultimaVezQueSalvou: number,
@@ -37,7 +28,53 @@ export interface salvo {
   velocidadeDoTexto: number,
 }
 
-export interface evento {
+class audioEstrutura {
+  endereco: string = "";
+  volume?: number;
+}
+export interface personagem extends personagemEstrutura{};
+
+class personagemEstrutura {
+  nome: string = "";
+  endereco: string = "";
+  posicao?: string;
+  posX: number = 0;
+  posY: number = 0;
+  espelhado: boolean = false;
+}
+export interface personagem extends personagemEstrutura{};
+
+class eventoEstrutura {
+  escreverMensagem?: string;
+  esperarTempo?: number;
+  mudarCenario?: string; //| {endereco: string, tempo?: number};
+  tocarMusica?: string | {endereco: string, volume?: number};
+  tocarSom?: string | {endereco: string, volume?: number};
+  adicionarPersonagem?: {nome: string, endereco: string, posicao?: string, posX?: number, posY?: number, espelhado?: boolean};
+  mudarSpritePersonagem?: {nome: string, endereco: string, espelhado?: boolean};
+  moverPersonagem?: {nome: string, posicao?: string, posX?: number, posY?: number, espelhado?: boolean};
+  virarSpritePersonagem?: string | {nome: string, espelhado?: boolean};
+  removerPersonagem?: string;
+  removerCenario?: boolean;
+  pararMusica?: boolean;
+  esperarInteracao?: boolean;
+}
+export interface evento extends eventoEstrutura{};
+
+//type arrayDaEstruturaDosEventos = Array<keyof evento>;
+//const arrayDasPropriedadesDosEventos: arrayDaEstruturaDosEventos =
+//    Object.keys(new eventoEstrutura()) as arrayDaEstruturaDosEventos;
+//type arrayDaEstruturaDosPersonagens = Array<keyof personagem>;
+//const arrayDasPropriedadesDosPersonagens: arrayDaEstruturaDosPersonagens =
+//    Object.keys(new personagemEstrutura()) as arrayDaEstruturaDosPersonagens;
+
+export const propsEventos = Object.getOwnPropertyNames(new eventoEstrutura());
+export const propsPersonagens = Object.getOwnPropertyNames(new personagemEstrutura());
+export const propsAudios = Object.getOwnPropertyNames(new audioEstrutura());
+
+export const propriedadesDosEventos = propsEventos.concat(propsPersonagens,propsAudios);
+
+/*export interface evento {
   escreverMensagem?: string,
   adicionarPersonagem?: {nome: string, endereco: string, posicao?: string, posX?: number, posY?: number, espelhar?: boolean},
   mudarSpritePersonagem?: {nome: string, endereco: string, espelhar?: boolean},
@@ -46,9 +83,9 @@ export interface evento {
   removerPersonagem?: string,
   mudarCenario?: string, //| {endereco: string, tempo?: number},
   removerCenario?: boolean,
-  mudarMusica?: string | {endereco: string, volume?: number},
+  tocarMusica?: string | {endereco: string, volume?: number},
   pararMusica?: boolean,
   tocarSom?: string | {endereco: string, volume?: number},
   esperarTempo?: number,
   esperarInteracao?: boolean,
-}
+}*/

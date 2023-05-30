@@ -1,6 +1,6 @@
 {
   "roteiro": [
-    {"mudarCenario": "imagensDeFundo.cg1", "mudarMusica": "musicas.titulo"},
+    {"mudarCenario": "imagensDeFundo.cg1", "tocarMusica": "musicas.titulo"},
     {"esperarTempo": 2000},
     {"escreverMensagem": "Olhando para a visão da cidade abaixo, eu via."},
     {"escreverMensagem": "As luzes, as pessoas, as músicas, as danças, a alegria."},

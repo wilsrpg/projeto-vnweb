@@ -12,7 +12,7 @@ export enum acoes {
   mudarImagemDeFundo = "mudarImagemDeFundo",
   alternarAudio = "alternarAudio",
   mudarVolume = "mudarVolume",
-  mudarMusica = "mudarMusica",
+  tocarMusica = "tocarMusica",
   tocarSom = "tocarSom",
   adicionarPersonagem = "adicionarPersonagem",
   mudarSpritePersonagem = "mudarSprite",
@@ -75,7 +75,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
     case acoes.mudarVolume:
       return { ...estado, volumeGeral: acao.numero1! };
 
-    case acoes.mudarMusica:
+    case acoes.tocarMusica:
       if(!acao.endereco)
         return { ...estado, musicaAtual: null };
       let volumeMusica = 100;

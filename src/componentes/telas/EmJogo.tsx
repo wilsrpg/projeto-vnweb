@@ -66,8 +66,8 @@ export default function EmJogo() {
         sistema?.despachar({tipo: acoes.mudarImagemDeFundo, endereco: ""});
       }
 
-      if(roteiro[i].mudarMusica){
-        let bgm = roteiro[i].mudarMusica;
+      if(roteiro[i].tocarMusica){
+        let bgm = roteiro[i].tocarMusica;
         if(sistema?.estado.msgsConsole.roteiro){
           if(typeof bgm == "string")
             console.log("mudando bgm="+bgm);
@@ -83,11 +83,11 @@ export default function EmJogo() {
           if(bgm.volume)
             volume = bgm.volume;
         }
-        sistema?.despachar({tipo: acoes.mudarMusica, endereco: endereco, numero1: volume});
+        sistema?.despachar({tipo: acoes.tocarMusica, endereco: endereco, numero1: volume});
       }
 
       if(roteiro[i].pararMusica){
-        sistema?.despachar({tipo: acoes.mudarMusica, endereco: ""});
+        sistema?.despachar({tipo: acoes.tocarMusica, endereco: ""});
       }
 
       if(roteiro[i].tocarSom){
@@ -118,7 +118,7 @@ export default function EmJogo() {
         let posicao = roteiro[i].adicionarPersonagem?.posicao;
         let posX = roteiro[i].adicionarPersonagem?.posX;
         let posY = roteiro[i].adicionarPersonagem?.posY;
-        let espelhar = roteiro[i].adicionarPersonagem?.espelhar;
+        let espelhar = roteiro[i].adicionarPersonagem?.espelhado;
         sistema.despachar({tipo: acoes.adicionarPersonagem, nome: nome, endereco: endereco, string: posicao, numero1: posX, numero2: posY, opcao: espelhar});
       }
       
@@ -127,16 +127,16 @@ export default function EmJogo() {
           console.log("mudando sprite do personagem "+roteiro[i].mudarSpritePersonagem?.nome+" para "+roteiro[i].mudarSpritePersonagem?.endereco);
         let nome = roteiro[i].mudarSpritePersonagem?.nome;
         let endereco = roteiro[i].mudarSpritePersonagem?.endereco;
-        let espelhar = roteiro[i].mudarSpritePersonagem?.espelhar;
+        let espelhar = roteiro[i].mudarSpritePersonagem?.espelhado;
         sistema.despachar({tipo: acoes.mudarSpritePersonagem, nome: nome, endereco: endereco, opcao: espelhar});
       }
 
       if(roteiro[i].moverPersonagem){
         if(sistema?.estado.msgsConsole.roteiro)
-          console.log("movendo personagem "+roteiro[i].moverPersonagem?.nome+" para "+roteiro[i].moverPersonagem?.posicao+", espelhar="+roteiro[i].moverPersonagem?.espelhar);
+          console.log("movendo personagem "+roteiro[i].moverPersonagem?.nome+" para "+roteiro[i].moverPersonagem?.posicao+", espelhar="+roteiro[i].moverPersonagem?.espelhado);
         let nome = roteiro[i].moverPersonagem?.nome;
         let posicao = roteiro[i].moverPersonagem?.posicao;
-        let espelhar = roteiro[i].moverPersonagem?.espelhar;
+        let espelhar = roteiro[i].moverPersonagem?.espelhado;
         let posX = roteiro[i].moverPersonagem?.posX;
         let posY = roteiro[i].moverPersonagem?.posY;
         sistema.despachar({tipo: acoes.moverPersonagem, nome: nome, string: posicao, numero1: posX, numero2: posY, opcao: espelhar});
@@ -156,7 +156,7 @@ export default function EmJogo() {
           nome = pers;
         else if(typeof pers == "object"){
           nome = pers.nome;
-          espelhar = pers.espelhar;
+          espelhar = pers.espelhado;
         }
         sistema?.despachar({tipo: acoes.virarPersonagem, nome: nome, opcao: espelhar});
       }
