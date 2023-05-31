@@ -16,15 +16,29 @@ export default function EmJogo() {
     if(sistema?.estado.msgsConsole.effects)
       console.log("ef emJogo [], roteiroAtual="+sistema?.estado.roteiroAtual);
     sistema?.despachar({tipo: acoes.mudarEvento, numero1: 0});
+    new Promise(r=>setTimeout(r,500))
+    .then(()=>{
+      sistema?.despachar({tipo: acoes.exibirPainelInferior, opcao: true});
+    })
+
+    return ()=>{
+      const controles = document.getElementById("controles");
+      if(controles)
+        sistema?.ocultarElemento(controles);
+      new Promise(r=>setTimeout(r,500))
+      .then(()=>{
+        sistema?.despachar({tipo: acoes.exibirPainelInferior, opcao: false});
+      })
+    }
   }, [])
 
   useEffect(()=>{
-    if(sistema?.estado.arquivoSalvoPraCarregar?.roteiroAtual != undefined){
+    if(sistema?.estado.arquivoSalvoParaCarregar?.roteiroAtual != undefined){
       if(sistema?.estado.msgsConsole.effects)
-        console.log("ef emJogo salvo, carregando roteiro salvo="+sistema?.estado.arquivoSalvoPraCarregar.roteiroAtual);
-      definirRoteiro(roteiros[sistema?.estado.arquivoSalvoPraCarregar.roteiroAtual]);
+        console.log("ef emJogo salvo, carregando roteiro salvo="+sistema?.estado.arquivoSalvoParaCarregar.roteiroAtual);
+      definirRoteiro(roteiros[sistema?.estado.arquivoSalvoParaCarregar.roteiroAtual]);
     }
-  }, [sistema?.estado.arquivoSalvoPraCarregar])
+  }, [sistema?.estado.arquivoSalvoParaCarregar])
 
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
@@ -173,7 +187,7 @@ export default function EmJogo() {
         let n = roteiro[i].esperarTempo;
         if(n != undefined){
           let ms = n;
-          await new Promise((resolve) => setTimeout(() => resolve(""), ms));
+          await new Promise(r=>setTimeout(r,ms));
           if(sistema?.estado.msgsConsole.roteiro)
             console.log("terminou d esperar");
         }

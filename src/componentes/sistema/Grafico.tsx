@@ -20,7 +20,7 @@ export default function Grafico(){
   useEffect(() => {
     if(sistema?.estado.msgsConsole.effects)
       console.log("ef gráfico, bgi="+sistema?.estado.imagemDeFundoAtual);
-    if(!cenarioImg.current || !sistema?.estado.imagemDeFundoAtual)
+    if(!cenarioImg.current || sistema?.estado.imagemDeFundoAtual == undefined)
       return;
     transicionarImagemDeFundo();
   }, [sistema?.estado.imagemDeFundoAtual]);
@@ -30,15 +30,7 @@ export default function Grafico(){
       await sistema?.ocultarElemento(cenarioImg.current, tempo);
       if (sistema?.estado.imagemDeFundoAtual)
         cenarioImg.current.src = sistema.estado.imagemDeFundoAtual;
-      await new Promise(resolve=>{
-        cenarioImg.current?.addEventListener("load", ()=>resolve(""))
-      })
-      //aki; passar esse trecho pro sistema \
-      if(sistema?.estado.telaAtual == "jogo")
-        sistema?.despachar({tipo: acoes.exibirPainelInferior, opcao: true});
-      else
-        sistema?.despachar({tipo: acoes.exibirPainelInferior, opcao: false});
-      //passar esse trecho pro sistema /
+      await new Promise(r=>{cenarioImg.current?.addEventListener("load",r,{once: true})});
       if(cenarioImg.current.src)
         await sistema?.exibirElemento(cenarioImg.current, tempo);
     }
@@ -61,7 +53,7 @@ export default function Grafico(){
 
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
-      console.log("ef persPraRemov="+sistema?.estado.personagemParaRemover);
+      console.log("ef persParaRemov="+sistema?.estado.personagemParaRemover);
     if(!sistema?.estado.personagemParaRemover)
       return;
     let id = -1;
@@ -82,19 +74,19 @@ export default function Grafico(){
 
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
-      console.log("ef persPraAdic="+sistema?.estado.personagemParaAdicionar?.endereco+", "+sistema?.estado.personagemParaAdicionar?.posicao);
+      console.log("ef persParaAdic="+sistema?.estado.personagemParaAdicionar?.endereco+", "+sistema?.estado.personagemParaAdicionar?.posicao);
     if(!sistema?.estado.personagemParaAdicionar)
       return;
       const pers = new Image();
       pers.src = sistema.estado.personagemParaAdicionar.endereco;
-      new Promise(resolve=>
-        pers.addEventListener("load", ()=>resolve("")))
+      new Promise(r=>pers.addEventListener("load",r,{once: true}))
       .then(()=>{
         if(sistema.estado.personagemParaAdicionar?.espelhado == true)
           pers.style.transform = "rotateY(180deg)";
         sistema.estado.personagensNaTelaImg?.push(pers);
         if(sistema?.estado.personagemParaAdicionar)
           sistema.estado.personagensNaTela?.push(sistema?.estado.personagemParaAdicionar);
+        
         //centralizar no ponto escolhido
         let largPersRedimensionada = pers.width * estadoInicial.alturaTela/pers.height;
         let posX = 0;
@@ -103,6 +95,7 @@ export default function Grafico(){
         let posY = 0;
         if(sistema?.estado.personagemParaAdicionar?.posY)
           posY = sistema?.estado.personagemParaAdicionar?.posY;
+        
         adicionarPersonagem(posX, posY);
         sistema.despachar({tipo: acoes.adicionarPersonagem, opcao: false});
       })
@@ -111,9 +104,9 @@ export default function Grafico(){
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
       console.log("ef gráfico, adicionarPersonagensDoSalvo="+sistema?.estado.adicionandoPersonagensDoSalvo);
-    if(sistema?.estado.arquivoSalvoPraCarregar && sistema.estado.arquivoSalvoPraCarregar.personagensNaTela.length
+    if(sistema?.estado.arquivoSalvoParaCarregar && sistema.estado.arquivoSalvoParaCarregar.personagensNaTela.length
        && sistema?.estado.adicionandoPersonagensDoSalvo){
-      const perss = sistema.estado.arquivoSalvoPraCarregar.personagensNaTela;
+      const perss = sistema.estado.arquivoSalvoParaCarregar.personagensNaTela;
       aux(perss);
       sistema.despachar({tipo: acoes.adicionarPersonagensDoSalvo, opcao: false});
       sistema.despachar({tipo: acoes.carregar, opcao: false});
@@ -124,8 +117,7 @@ export default function Grafico(){
     const tela = document.getElementById("gráfico");
     if(tela)
       await sistema?.ocultarElemento(tela,100);
-    if(sistema?.estado.arquivoSalvoPraCarregar){
-      //const perss = sistema.estado.arquivoSalvoPraCarregar.personagensNaTela;
+    if(sistema?.estado.arquivoSalvoParaCarregar){
       await adicionarPersonagensDoArquivoSalvo(perss,0);
       if(tela)
         sistema?.exibirElemento(tela,1000);
@@ -141,25 +133,26 @@ export default function Grafico(){
     }
   }
 
-  async function adicionarPers2(persPraAd: personagem) {
+  async function adicionarPers2(persParaAdic: personagem) {
     if(!sistema)
       return;
     const persImg = new Image();
-    persImg.src = persPraAd.endereco;
-    await new Promise(resolve=>persImg.addEventListener("load", ()=>resolve("")));
+    persImg.src = persParaAdic.endereco;
+    await new Promise(r=>persImg.addEventListener("load",r,{once: true}));
     persImg.style.position = "absolute";
     persImg.style.height = "100%";
     persImg.style.width = "auto";
-    if(persPraAd.espelhado == true)
+    if(persParaAdic.espelhado == true)
       persImg.style.transform = "rotateY(180deg)";
 
     //centralizar no ponto escolhido
     let largPersRedimensionada = persImg.width * estadoInicial.alturaTela/persImg.height;
-    let posX = persPraAd.posX - largPersRedimensionada/2;
-    let posY = persPraAd.posY;
+    let posX = persParaAdic.posX - largPersRedimensionada/2;
+    let posY = persParaAdic.posY;
     persImg.style.top = posY+"px";
     persImg.style.left = posX+"px";
-    sistema.estado.personagensNaTela.push(persPraAd);
+
+    sistema.estado.personagensNaTela.push(persParaAdic);
     sistema.estado.personagensNaTelaImg.push(persImg);
     if(persDiv.current){
       persDiv.current.appendChild(persImg);
@@ -206,8 +199,6 @@ export default function Grafico(){
       {sistema?.estado.telaAtual == "apresentação" ? <Apresentacao/> : ""}
       {sistema?.estado.telaAtual == "menu inicial" ? <TelaInicial/> : ""}
       {sistema?.estado.telaAtual == "jogo" ? <EmJogo/> : ""}
-      {/*{sistema?.estado.telaAtual == "opções" ? <TelaDeOpcoes/> : ""}*/}
-      {/*{sistema?.estado.telaAtual == "arquivos" ? <TelaDeArquivos/> : ""}*/}
       
       {sistema?.estado.exibindoPainelInferior && <PainelInferior/>}
       {sistema?.estado.exibindoTelaDeOpcoes && <TelaDeOpcoes/>}

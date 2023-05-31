@@ -17,8 +17,8 @@ export default function GerenciadorDeArquivos(prop:{
   const sistema = useContext(contexto);
   const leitorDeArquivos = new FileReader();
   const [arquivos,definirArquivos] = useState<FileList>();
-  const [arquivosPraAdicionarStt,definirArquivosPraAdicionarStt] = useState<{nome:string, endereco:string}[]>([]);
-  const arquivosPraAdicionarRef = useRef<{nome:string, endereco:string}[]>([]);
+  const [arquivosParaAdicionarStt,definirarquivosParaAdicionarStt] = useState<{nome:string, endereco:string}[]>([]);
+  const arquivosParaAdicionarRef = useRef<{nome:string, endereco:string}[]>([]);
   let arrays = {imagensDeFundo,personagens,musicas,sons};
   let array = prop.nomeDoObjetoDestinoDosArquivos as keyof typeof arrays;
   if(sistema?.estado.msgsConsole.renderizacoes)
@@ -30,7 +30,7 @@ export default function GerenciadorDeArquivos(prop:{
     if(arquivos?.length){
       adicionarArquivos(arquivos)
       .then(()=>{
-        definirArquivosPraAdicionarStt(arquivosPraAdicionarRef.current);
+        definirarquivosParaAdicionarStt(arquivosParaAdicionarRef.current);
         definirArquivos(undefined);})
     }
   }, [arquivos]);
@@ -38,16 +38,16 @@ export default function GerenciadorDeArquivos(prop:{
   async function adicionarArquivos(listaArqs: FileList | undefined, i = 0) {
     if(listaArqs){
       leitorDeArquivos.readAsDataURL(listaArqs[i]);
-      await new Promise((r)=>leitorDeArquivos.addEventListener("load",r))
+      await new Promise(r=>leitorDeArquivos.addEventListener("load",r,{once: true}))
       if(typeof leitorDeArquivos.result == "string")
-        arquivosPraAdicionarRef.current.push({nome:listaArqs[i].name, endereco:leitorDeArquivos.result});
+        arquivosParaAdicionarRef.current.push({nome:listaArqs[i].name, endereco:leitorDeArquivos.result});
       i++;
       if(i < listaArqs?.length)
         await adicionarArquivos(listaArqs,i);
     }
   }
 
-  function passarPraLowerCamelCaseAlfanumerico(s: string) {
+  function passarParaLowerCamelCaseAlfanumerico(s: string) {
     let ss = s.split(RegExp("\\W","g"));
     ss.map((palavra,i)=>{
       if(i>0 && palavra.length>0)
@@ -104,7 +104,7 @@ export default function GerenciadorDeArquivos(prop:{
       />
     </div>
     )}
-    {arquivosPraAdicionarStt.map(({nome,endereco},k)=>
+    {arquivosParaAdicionarStt.map(({nome,endereco},k)=>
     <div key={k*2+1}>
       {prop.tipo == "imagem" &&
         <img src={endereco} height="20" style={{marginRight: "1%", border: "solid 1px white"}}/>
@@ -124,7 +124,7 @@ export default function GerenciadorDeArquivos(prop:{
         id={"nome"+k}
         className="nome"
         maxLength={32}
-        defaultValue={(passarPraLowerCamelCaseAlfanumerico(nome.slice(0,nome.lastIndexOf(".")))).slice(0,32)} //remove extensão ants d chamar a função
+        defaultValue={(passarParaLowerCamelCaseAlfanumerico(nome.slice(0,nome.lastIndexOf(".")))).slice(0,32)} //remove extensão ants d chamar a função
         style={{border: "solid 1px white"}}
         onChange={(e)=>e.target.style.borderColor = "white"}
       />
@@ -167,16 +167,16 @@ export default function GerenciadorDeArquivos(prop:{
               campo.focus();
             }
           } else {
-            arrays[array][nomeArq] = arquivosPraAdicionarRef.current[k].endereco;
-            for(let i=k; i<arquivosPraAdicionarStt.length-1; i++){
+            arrays[array][nomeArq] = arquivosParaAdicionarRef.current[k].endereco;
+            for(let i=k; i<arquivosParaAdicionarStt.length-1; i++){
               let campos = document.getElementsByClassName("nome");
               let campoAtual = campos[i];
               let proximoCampo = campos[i+1];
               if(campoAtual instanceof HTMLInputElement && proximoCampo instanceof HTMLInputElement)
                 campoAtual.value = proximoCampo.value;
             }
-            arquivosPraAdicionarRef.current = arquivosPraAdicionarRef.current.filter((v,i)=>{return i != k});
-            definirArquivosPraAdicionarStt(arquivosPraAdicionarRef.current);
+            arquivosParaAdicionarRef.current = arquivosParaAdicionarRef.current.filter((v,i)=>{return i != k});
+            definirarquivosParaAdicionarStt(arquivosParaAdicionarRef.current);
           }
         }}
       />
@@ -184,15 +184,15 @@ export default function GerenciadorDeArquivos(prop:{
         som=""
         style={{marginLeft: "1%"}}
         func={()=>{
-          for(let i=k; i<arquivosPraAdicionarStt.length-1; i++){
+          for(let i=k; i<arquivosParaAdicionarStt.length-1; i++){
             let campos = document.getElementsByClassName("nome");
             let campoAtual = campos[i];
             let proximoCampo = campos[i+1];
             if(campoAtual instanceof HTMLInputElement && proximoCampo instanceof HTMLInputElement)
               campoAtual.value = proximoCampo.value;
           }
-          arquivosPraAdicionarRef.current = arquivosPraAdicionarRef.current.filter((v,i)=>{return i!=k});
-          definirArquivosPraAdicionarStt(arquivosPraAdicionarRef.current);
+          arquivosParaAdicionarRef.current = arquivosParaAdicionarRef.current.filter((v,i)=>{return i!=k});
+          definirarquivosParaAdicionarStt(arquivosParaAdicionarRef.current);
         }}
       />
     </div>

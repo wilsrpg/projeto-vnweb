@@ -16,7 +16,6 @@ export const roteiro: evento[] = [
   {escreverMensagem: "Clebim:\nSó gente morta caída ao chão! Quem poderia ter feito isso?"},
   {moverPersonagem: {nome: "protagonista", posicao: "esquerda", espelhado: true}},
   {adicionarPersonagem: {nome: "irmão", endereco: personagens.irmao, posicao: "direita"}, esperarTempo: 1000},
-  // {esperarInteracao: true},
   {escreverMensagem: "Clebim:\nCleitão?! O que você está fazendo aqui?"},
   {moverPersonagem: {nome: "irmão", espelhado: true}},
   {escreverMensagem: "Cleitão:\nHum?"},

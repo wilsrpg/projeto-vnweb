@@ -47,8 +47,7 @@ export default function Som() {
     }
     if(sistema?.estado.musicaAtual?.endereco)
       audioElem.current.src = sistema?.estado.musicaAtual?.endereco;
-    new Promise(resolve=>
-      audioElem.current?.addEventListener("loadeddata", ()=>resolve("")))
+    new Promise(r=>audioElem.current?.addEventListener("loadeddata",r,{once: true}))
     .then(()=>{
       if(audioElem.current && sistema?.estado.musicaAtual){
         audioElem.current.volume = sistema?.estado.musicaAtual.volume/100 * sistema?.estado.volumeGeral/100;
@@ -72,8 +71,8 @@ export default function Som() {
     somAudio.current.volume = sistema?.estado.somParaTocar.volume/100 * sistema?.estado.volumeGeral/100;
     if(sistema?.estado.msgsConsole.effects)
       console.log("ef audio som="+somAudio.current.src);
-    //new Promise((resolve) => {
-    //  somAudio.current.addEventListener("loadeddata", ()=>resolve(""))
+    //new Promise(r=>{
+    //  somAudio.current.addEventListener("loadeddata",r,{once: true})
     //})
     //.then(()=>{
       somAudio.current.play();

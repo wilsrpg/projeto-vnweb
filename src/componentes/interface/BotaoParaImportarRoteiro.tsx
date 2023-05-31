@@ -8,7 +8,7 @@ import Botao from "./Botao";
 import { roteiros } from "../roteiros/ListaDeRoteiros";
 import { evento, propsAudios, propsEventos, propsPersonagens } from "../sistema/TiposDeObjetos";
 
-export default function BotaoPraImportarRoteiro(prop:{nome: string,func: ()=>void}) {
+export default function BotaoParaImportarRoteiro(prop:{nome: string,func: ()=>void}) {
   const sistema = useContext(contexto);
   const leitorDeArquivos = new FileReader();
   const [arqRoteiro,definirArqRoteiro] = useState<File>();
@@ -18,7 +18,7 @@ export default function BotaoPraImportarRoteiro(prop:{nome: string,func: ()=>voi
       console.log("ef arqRoteiro="+arqRoteiro);
     if(arqRoteiro){
       leitorDeArquivos.readAsText(arqRoteiro);
-      new Promise((r)=>leitorDeArquivos.addEventListener("load",r))
+      new Promise(r=>leitorDeArquivos.addEventListener("load",r,{once: true}))
       .then(importarRoteiro);
     }
   }, [arqRoteiro]);

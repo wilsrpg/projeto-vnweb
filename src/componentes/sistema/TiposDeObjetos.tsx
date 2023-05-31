@@ -12,6 +12,7 @@ export interface Acao {
 
 export interface salvo {
   dataDeInicio: number,
+  tempoDeJogo: number,
   ultimaVezQueSalvou: number,
   roteiroAtual: number,
   eventoAtual: number,
@@ -28,22 +29,6 @@ export interface salvo {
   velocidadeDoTexto: number,
 }
 
-class audioEstrutura {
-  endereco: string = "";
-  volume?: number;
-}
-export interface personagem extends personagemEstrutura{};
-
-class personagemEstrutura {
-  nome: string = "";
-  endereco: string = "";
-  posicao?: string;
-  posX: number = 0;
-  posY: number = 0;
-  espelhado: boolean = false;
-}
-export interface personagem extends personagemEstrutura{};
-
 class eventoEstrutura {
   escreverMensagem?: string;
   esperarTempo?: number;
@@ -59,33 +44,23 @@ class eventoEstrutura {
   pararMusica?: boolean;
   esperarInteracao?: boolean;
 }
-export interface evento extends eventoEstrutura{};
+class personagemEstrutura {
+  nome: string = "";
+  endereco: string = "";
+  posicao?: string;
+  posX: number = 0;
+  posY: number = 0;
+  espelhado: boolean = false;
+}
+class audioEstrutura {
+  endereco: string = "";
+  volume?: number;
+}
 
-//type arrayDaEstruturaDosEventos = Array<keyof evento>;
-//const arrayDasPropriedadesDosEventos: arrayDaEstruturaDosEventos =
-//    Object.keys(new eventoEstrutura()) as arrayDaEstruturaDosEventos;
-//type arrayDaEstruturaDosPersonagens = Array<keyof personagem>;
-//const arrayDasPropriedadesDosPersonagens: arrayDaEstruturaDosPersonagens =
-//    Object.keys(new personagemEstrutura()) as arrayDaEstruturaDosPersonagens;
+export interface evento extends eventoEstrutura{};
+export interface personagem extends personagemEstrutura{};
+export interface audio extends audioEstrutura{};
 
 export const propsEventos = Object.getOwnPropertyNames(new eventoEstrutura());
 export const propsPersonagens = Object.getOwnPropertyNames(new personagemEstrutura());
 export const propsAudios = Object.getOwnPropertyNames(new audioEstrutura());
-
-export const propriedadesDosEventos = propsEventos.concat(propsPersonagens,propsAudios);
-
-/*export interface evento {
-  escreverMensagem?: string,
-  adicionarPersonagem?: {nome: string, endereco: string, posicao?: string, posX?: number, posY?: number, espelhar?: boolean},
-  mudarSpritePersonagem?: {nome: string, endereco: string, espelhar?: boolean},
-  moverPersonagem?: {nome: string, posicao?: string, posX?: number, posY?: number, espelhar?: boolean},
-  virarSpritePersonagem?: string | {nome: string, espelhar?: boolean},
-  removerPersonagem?: string,
-  mudarCenario?: string, //| {endereco: string, tempo?: number},
-  removerCenario?: boolean,
-  tocarMusica?: string | {endereco: string, volume?: number},
-  pararMusica?: boolean,
-  tocarSom?: string | {endereco: string, volume?: number},
-  esperarTempo?: number,
-  esperarInteracao?: boolean,
-}*/

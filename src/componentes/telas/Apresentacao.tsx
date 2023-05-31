@@ -24,7 +24,7 @@ export default function Apresentacao() {
       if(pulou.current == false)
         sistema?.despachar({tipo: acoes.tocarSom, endereco: sons.plem});
       if(pulou.current == false)
-        await new Promise((resolve) => setTimeout(() => resolve(""), 2000))
+        await new Promise(r=>setTimeout(r,2000))
       if(pulou.current == false)
         sistema?.despachar({tipo: acoes.tocarSom, endereco: sons.plem});
       if(pulou.current == false)
