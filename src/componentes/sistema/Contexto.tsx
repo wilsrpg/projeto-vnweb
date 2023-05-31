@@ -20,8 +20,8 @@ export const estadoInicial: iVariaveis = {
   musicaAtual: null,
   somParaTocar: null,
   dataDeInicio: 0,
-  //ultimaVezQueSalvou: 0,
   tempoDeJogo: 0,
+  ultimaVezQueCarregou: 0,
   roteiroAtual: -1,
   eventoAtual: -1,
   jogoPausado: false,
@@ -41,7 +41,7 @@ export const estadoInicial: iVariaveis = {
   fonte: "Times New Roman",
   corDaFonte: "#ffffff",
   velocidadeDoTexto: 3,
-  arquivoSalvoPraCarregar: null,
+  arquivoSalvoParaCarregar: null,
   adicionandoPersonagensDoSalvo: false,
 };
 
@@ -56,8 +56,8 @@ export interface iVariaveis {
   larguraTela: number,
   alturaTela: number,
   dataDeInicio: number,
-  //ultimaVezQueSalvou: number,
   tempoDeJogo: number,
+  ultimaVezQueCarregou: number,
   telaAtual: string,
   roteiroAtual: number,
   eventoAtual: number,
@@ -83,7 +83,7 @@ export interface iVariaveis {
   fonte: string,
   corDaFonte: string,
   velocidadeDoTexto: number,
-  arquivoSalvoPraCarregar: salvo | null,
+  arquivoSalvoParaCarregar: salvo | null,
   adicionandoPersonagensDoSalvo: boolean,
 }
 

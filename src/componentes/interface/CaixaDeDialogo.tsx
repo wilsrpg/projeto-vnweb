@@ -9,7 +9,7 @@ export default function CaixaDeDialogo(prop:{largura: string}){
 
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
-      console.log("ef cxDiag msgPraEscr="+sistema?.estado.mensagemParaEscrever);
+      console.log("ef cxDiag msgParaEscr="+sistema?.estado.mensagemParaEscrever);
     if(sistema?.estado.mensagemParaEscrever.length){
       sistema?.despachar({tipo: acoes.aceitarInteracao, opcao: true});
       sistema?.despachar({tipo: acoes.digitarMensagem, opcao: true});

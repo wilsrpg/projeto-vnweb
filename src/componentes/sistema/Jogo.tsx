@@ -18,19 +18,17 @@ export default function Jogo() {
   }, [])
 
   useEffect(()=>{
-    if(!estado.arquivoSalvoPraCarregar)
+    if(!estado.arquivoSalvoParaCarregar)
       return;
-    //transicionarTela();
-    estado.mensagemParaEscrever = "";
-    //despachar({tipo: acoes.escreverMensagem, string: ""});
-    let arquivo = estado.arquivoSalvoPraCarregar;
+    let arquivo = estado.arquivoSalvoParaCarregar;
+    despachar({tipo: acoes.definirDataDeInicio, numero1: arquivo.dataDeInicio});
+    despachar({tipo: acoes.definirTempoDeJogo, numero1: arquivo.tempoDeJogo});
     despachar({tipo: acoes.mudarTela, string: "jogo"});
     despachar({tipo: acoes.removerTodosOsPersonagens});
-    despachar({tipo: acoes.adicionarPersonagensDoSalvo, opcao: true});
+    despachar({tipo: acoes.adicionarPersonagensDoSalvo});
     despachar({tipo: acoes.mudarRoteiro, numero1: arquivo.roteiroAtual});
     despachar({tipo: acoes.mudarEvento, numero1: arquivo.eventoAtual});
     despachar({tipo: acoes.mudarImagemDeFundo, endereco: arquivo.imagemDeFundoAtual});
-    despachar({tipo: acoes.exibirPainelInferior, opcao: true});
     if(estado.audioHabilitado != arquivo.audioHabilitado)
       despachar({tipo: acoes.alternarAudio});
     despachar({tipo: acoes.mudarVolume, numero1: arquivo.volumeGeral});
@@ -40,11 +38,12 @@ export default function Jogo() {
     despachar({tipo: acoes.mudarVelocidadeDoTexto, numero1: arquivo.velocidadeDoTexto});
     despachar({tipo: acoes.limparHistorico});
     arquivo.historicoDeMensagens.map((msg: string, i: number)=>{
-      if(i < arquivo.historicoDeMensagens.length-1 || arquivo.digitandoMensagem)
+      if(i < arquivo.historicoDeMensagens.length-1)
         despachar({tipo: acoes.adicionarAoHistorico, string: msg});
     });
-    despachar({tipo: acoes.escreverMensagem, string: arquivo.mensagemParaEscrever});
-  }, [estado.arquivoSalvoPraCarregar])
+    if(!estado.digitandoMensagem)
+      despachar({tipo: acoes.escreverMensagem, string: arquivo.mensagemParaEscrever});
+  }, [estado.arquivoSalvoParaCarregar])
 
   //efeitos de fade-out e fade-in, podem ser usados com qualquer elemento;
   //retornam uma promise após o tempo de transição, que pode ser usada com
@@ -70,7 +69,8 @@ export default function Jogo() {
     despachar({tipo: acoes.removerTodosOsPersonagens});
     despachar({tipo: acoes.limparHistorico});
     despachar({tipo: acoes.escreverMensagem, string: ""});
-    despachar({tipo: acoes.exibirPainelInferior, opcao: false});
+    despachar({tipo: acoes.mudarRoteiro, numero1: -1});
+    despachar({tipo: acoes.mudarEvento, numero1: -1});
     despachar({tipo: acoes.mudarTela, string: "menu inicial"});
   }
 
@@ -78,9 +78,7 @@ export default function Jogo() {
   function aguardar(ms: number) {
     let minimo = 10;
     if(ms>0 && estado.telaAtual == "jogo")
-      setTimeout(() => {
-        aguardar(ms-minimo);
-      }, minimo);
+      setTimeout(()=>aguardar(ms-minimo), minimo);
   }
 
   function interagir(){

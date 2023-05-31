@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { acoes } from "../sistema/Redutor";
 import { contexto } from "../sistema/Contexto";
 import { imagensDeFundo } from "../mapeadores/ImagensDeFundo";
 import { musicas } from "../mapeadores/Musicas";
 import Botao from "../interface/Botao";
-import BotaoPraImportarRoteiro from "../interface/BotaoPraImportarRoteiro";
+import BotaoParaImportarRoteiro from "../interface/BotaoParaImportarRoteiro";
 
 export default function TelaInicial() {
   const sistema = useContext(contexto);
@@ -19,20 +19,21 @@ export default function TelaInicial() {
     sistema?.despachar({tipo: acoes.mudarImagemDeFundo, endereco: imagensDeFundo.titulo});
     sistema?.despachar({tipo: acoes.tocarMusica, endereco: musicas.idk, numero1: 50});
     sistema?.despachar({tipo: acoes.aceitarInteracao, opcao: false});
-    sistema?.despachar({tipo: acoes.mudarRoteiro, numero1: -1});
-    sistema?.despachar({tipo: acoes.mudarEvento, numero1: -1});
     menuInicial = document.getElementById("menu");
-    new Promise((resolve) => {setTimeout(() => {resolve("");}, 1000);})
+    new Promise(r=>setTimeout(r,1000))
     .then(()=>{
-    if(menuInicial){
-      sistema?.exibirElemento(menuInicial);}
+      if(menuInicial)
+        sistema?.exibirElemento(menuInicial);
     })
   }, [])
 
   function menuNovoJogo(){
+    if(sistema) sistema.estado.eventoAtual = -1; //isso impede um bug q acontecia qd a psoa voltava pra tela inicial no meio d um evento de espera, q fazia o roteiro seguinte pular o 1o evento na hr da execução
     sistema?.despachar({tipo: acoes.mudarRoteiro, numero1: 1});
     sistema?.despachar({tipo: acoes.mudarTela, string: "jogo"});
     sistema?.despachar({tipo: acoes.definirDataDeInicio, numero1: Date.now()});
+    sistema?.despachar({tipo: acoes.definirTempoDeJogo, numero1: 0});
+    sistema?.despachar({tipo: acoes.definirUltimaVezQueCarregou, numero1: Date.now()});
   }
 
   function menuTestarRoteiro(){
@@ -62,7 +63,7 @@ export default function TelaInicial() {
       }}
     >
       <Botao nome="Novo jogo" func={menuNovoJogo}/>
-      <BotaoPraImportarRoteiro nome="Importar roteiro e executar" func={menuTestarRoteiro}/>
+      <BotaoParaImportarRoteiro nome="Importar roteiro e executar" func={menuTestarRoteiro}/>
       <Botao nome="Opções" func={menuOpcoes}/>
       <Botao nome="Gerenciar arquivos" func={menuArquivos}/>
     </div>

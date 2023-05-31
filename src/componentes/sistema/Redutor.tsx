@@ -4,6 +4,7 @@ import { Acao, personagem, salvo } from "./TiposDeObjetos";
 export enum acoes {
   mudarTela = "mudarTela",
   definirDataDeInicio = "definirDataDeInicio",
+  definirUltimaVezQueCarregou = "definirUltimaVezQueCarregou",
   mudarRoteiro = "mudarRoteiro",
   mudarEvento = "mudarEvento",
   proximoEvento = "proximoEvento",
@@ -34,6 +35,7 @@ export enum acoes {
   salvar = "salvar",
   carregar = "carregar",
   excluirSalvo = "excluirSalvo",
+  definirTempoDeJogo = "definirTempoDeJogo",
   adicionarPersonagensDoSalvo = "adicionarPersonagensDoSalvo",
 };
 
@@ -48,6 +50,9 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       
     case acoes.definirDataDeInicio:
       return { ...estado, dataDeInicio: acao.numero1! };
+    
+    case acoes.definirUltimaVezQueCarregou:
+      return { ...estado, ultimaVezQueCarregou: acao.numero1! };
 
     case acoes.mudarRoteiro:
       return { ...estado, roteiroAtual: acao.numero1! };
@@ -151,12 +156,9 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       let persMov: personagem;
       let idMov = -1;
       estado.personagensNaTela.map((pers,i)=>{
-        //console.log("redutor>moverSpr>buscando id> pers["+i+"].nome="+pers.nome);
         if(acao.nome && pers.nome == acao.nome)
           idMov = i;
       })
-      //console.log("movendo pers "+acao.nome+", id="+idMov);
-      //console.log("nome="+estado.personagensNaTela[idMov].nome);
       persMov = estado.personagensNaTela[idMov];
 
       if(acao.numero1 != undefined)
@@ -189,8 +191,6 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         if(acao.nome && pers.nome == acao.nome)
           idVir = i;
       })
-      //console.log("movendo pers "+acao.nome+", id="+idMov);
-      //console.log("nome="+estado.personagensNaTela[idMov].nome);
       persVir = estado.personagensNaTela[idVir];
 
       if(acao.opcao != undefined)
@@ -251,18 +251,16 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         salvar = true;
       } else {
         let arqSalvo = JSON.parse(localStorage.salvo);
-        //let dataIni = converterEmData(arqSalvo.dataDeInicio);
-        //let dataUlt = converterEmData(arqSalvo.ultimaVezQueSalvou);
-        //let tempoJogo = converterEmHoras(arqSalvo.ultimaVezQueSalvou - arqSalvo.dataDeInicio);
         salvar = confirm("Sobrescrever o jogo salvo?"
           +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
           +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
-          +"\nTempo de jogo: "+converterEmHoras(arqSalvo.ultimaVezQueSalvou - arqSalvo.dataDeInicio)
+          +"\nTempo de jogo: "+converterEmHoras(arqSalvo.tempoDeJogo)
         );
       }
       if(salvar){
         let arquivo: salvo = {
           dataDeInicio: estado.dataDeInicio,
+          tempoDeJogo: estado.tempoDeJogo + Date.now() - estado.ultimaVezQueCarregou,
           ultimaVezQueSalvou: Date.now(),
           roteiroAtual: estado.roteiroAtual,
           eventoAtual: estado.eventoAtual,
@@ -286,24 +284,24 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       
     case acoes.carregar:
       if(acao.opcao == false)
-        return { ...estado, arquivoSalvoPraCarregar: null }
+        return { ...estado, arquivoSalvoParaCarregar: null }
       if (localStorage.length == 0){
         alert("Não há jogo salvo.");
         return { ...estado };
       } else {
-        //console.log(JSON.parse(localStorage.salvo));
         let arqSalvo = JSON.parse(localStorage.salvo);
         let carregar = confirm("Carregar o jogo salvo?"
           +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
           +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
-          +"\nTempo de jogo: "+converterEmHoras(arqSalvo.ultimaVezQueSalvou - arqSalvo.dataDeInicio)
+          +"\nTempo de jogo: "+converterEmHoras(arqSalvo.tempoDeJogo)
         );
         if(carregar)
-          return { ...estado, mensagemParaEscrever: "", arquivoSalvoPraCarregar: JSON.parse(localStorage.salvo) };
+          return { ...estado, arquivoSalvoParaCarregar: JSON.parse(localStorage.salvo), ultimaVezQueCarregou: Date.now(),
+                  mensagemParaEscrever: "" }; //senão não escreve a msg do salvo, se a msg exibida no momento for igual a ela
         else
           return { ...estado };
       }
-  
+
     case acoes.excluirSalvo:
       if (localStorage.length == 0){
         alert("Não há jogo salvo.");
@@ -312,7 +310,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         let excluir = confirm("Excluir o jogo salvo?"
           +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
           +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
-          +"\nTempo de jogo: "+converterEmHoras(arqSalvo.ultimaVezQueSalvou - arqSalvo.dataDeInicio)
+          +"\nTempo de jogo: "+converterEmHoras(arqSalvo.tempoDeJogo)
         );
         if(excluir){
           localStorage.removeItem("salvo");
@@ -320,13 +318,18 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         }
       }
       return { ...estado };
-  
+
     case acoes.adicionarPersonagensDoSalvo:
       let op = false;
-      if(acao.opcao)
+      if(acao.opcao == undefined)
+        op = true;
+      else
         op = acao.opcao;
       return { ...estado, adicionandoPersonagensDoSalvo: op };
-        
+
+    case acoes.definirTempoDeJogo:
+      return { ...estado, tempoDeJogo: acao.numero1! };
+    
     default:
       // throw new Error("Opção '"+acao.tipo+"' não existe no redutor.\n");
       alert("Opção '"+acao.tipo+"' não existe no redutor.\n");
