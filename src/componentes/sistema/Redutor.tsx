@@ -199,7 +199,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         persVir.espelhado = !persVir.espelhado;
       
       return { ...estado, personagemParaRemover: persVir.nome, personagemParaAdicionar: persVir };
-  
+
     case acoes.removerPersonagem:
       if(!acao.nome)
         return { ...estado, personagemParaRemover: null };
@@ -212,38 +212,67 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         return { ...estado, removendoTodosOsPersonagens: acao.opcao };
 
     case acoes.exibirPainelInferior:
-      return { ...estado, exibindoPainelInferior: acao.opcao! };
+      if(acao.opcao == undefined)
+        return { ...estado, exibindoPainelInferior: true };
+      else
+        return { ...estado, exibindoPainelInferior: acao.opcao };
 
     case acoes.escreverMensagem:
-      return { ...estado, mensagemParaEscrever: acao.string! };
+      let msg = "";
+      if(acao.string)
+        msg = acao.string;
+      return { ...estado, mensagemParaEscrever: msg };
 
     case acoes.digitarMensagem:
-      return { ...estado, digitandoMensagem: acao.opcao! };
+      if(acao.opcao == undefined)
+        return { ...estado, digitandoMensagem: true };
+      else
+        return { ...estado, digitandoMensagem: acao.opcao };
 
     case acoes.adicionarAoHistorico:
-      let qqtemaver = acao.string!;
-      return { ...estado, historicoDeMensagens: [ ...estado.historicoDeMensagens, qqtemaver ] };
+      if(!acao.string)
+        return { ...estado };
+      else
+        return { ...estado, historicoDeMensagens: [ ...estado.historicoDeMensagens, acao.string ] };
 
     case acoes.limparHistorico:
       return { ...estado, historicoDeMensagens: [] };
     
     case acoes.exibirTelaDoHistorico:
-      return { ...estado, exibindoTelaDoHistorico: acao.opcao! };
+      if(acao.opcao == undefined)
+        return { ...estado, exibindoTelaDoHistorico: true };
+      else
+        return { ...estado, exibindoTelaDoHistorico: acao.opcao };
   
     case acoes.exibirTelaDeOpcoes:
-      return { ...estado, exibindoTelaDeOpcoes: acao.opcao! };
+      if(acao.opcao == undefined)
+        return { ...estado, exibindoTelaDeOpcoes: true };
+      else
+        return { ...estado, exibindoTelaDeOpcoes: acao.opcao };
 
-      case acoes.exibirTelaDeArquivos:
-        return { ...estado, exibindoTelaDeArquivos: acao.opcao! };
+    case acoes.exibirTelaDeArquivos:
+      if(acao.opcao == undefined)
+        return { ...estado, exibindoTelaDeArquivos: true };
+      else
+        return { ...estado, exibindoTelaDeArquivos: acao.opcao };
   
     case acoes.mudarFonte:
-      return { ...estado, fonte: acao.string! };
+      if(acao.string)
+        return { ...estado, fonte: acao.string };
+      else
+        return { ...estado };
   
     case acoes.mudarCorDaFonte:
-      return { ...estado, corDaFonte: acao.string! };
+      if(acao.string)
+        return { ...estado, corDaFonte: acao.string };
+      else
+        return { ...estado };
       
     case acoes.mudarVelocidadeDoTexto:
-      return { ...estado, velocidadeDoTexto: acao.numero1! };
+      if(acao.numero1)
+        return { ...estado, velocidadeDoTexto: acao.numero1 };
+      else
+        return { ...estado };
 
     case acoes.salvar:
       let salvar = false;
