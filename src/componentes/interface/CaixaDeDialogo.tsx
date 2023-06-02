@@ -35,7 +35,7 @@ export default function CaixaDeDialogo(prop:{largura: string}){
           sistema?.despachar({tipo: acoes.digitarMensagem, opcao: false});
           sistema?.despachar({tipo: acoes.adicionarAoHistorico, string: msg});
         }
-      }, sistema.estado.velocidadeDoTexto*20);
+      }, 70-sistema.estado.velocidadeDoTexto*20); //velocidade do texto: 1, 2 ou 3 = um caractere a cada 50, 30 ou 10 ms
     } else if(dialDiv.current && sistema){
         dialDiv.current.innerHTML = msg;
         sistema.despachar({tipo: acoes.adicionarAoHistorico, string: msg});
