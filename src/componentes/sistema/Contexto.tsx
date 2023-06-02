@@ -40,7 +40,7 @@ export const estadoInicial: iVariaveis = {
   exibindoTelaDeArquivos: false,
   fonte: "Times New Roman",
   corDaFonte: "#ffffff",
-  velocidadeDoTexto: 3,
+  velocidadeDoTexto: 2,
   arquivoSalvoParaCarregar: null,
   adicionandoPersonagensDoSalvo: false,
 };

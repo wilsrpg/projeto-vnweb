@@ -86,15 +86,15 @@ export default function TelaDeOpcoes(){
 
           <span>Velocidade do texto:</span>
           <div id="velocidade do texto">
-            <input type="radio" id="velocidade lenta" name="velocidade do texto" value="5"
-              defaultChecked={sistema?.estado.velocidadeDoTexto == 5}
+            <input type="radio" id="velocidade lenta" name="velocidade do texto" value="3"
+              defaultChecked={sistema?.estado.velocidadeDoTexto == 3}
               onChange={(e)=>sistema?.despachar({tipo: acoes.mudarVelocidadeDoTexto, numero1: parseInt(e.currentTarget.value)})}
             />
             <label htmlFor="velocidade lenta" style={{fontFamily: sistema?.estado.fonte, color: sistema?.estado.corDaFonte}}>
               Lenta
             </label>
-            <input type="radio" id="velocidade normal" name="velocidade do texto" value="3"
-              defaultChecked={sistema?.estado.velocidadeDoTexto == 3}
+            <input type="radio" id="velocidade normal" name="velocidade do texto" value="2"
+              defaultChecked={sistema?.estado.velocidadeDoTexto == 2}
               onChange={(e)=>sistema?.despachar({tipo: acoes.mudarVelocidadeDoTexto, numero1: parseInt(e.currentTarget.value)})}
             />
             <label htmlFor="velocidade normal" style={{fontFamily: sistema?.estado.fonte, color: sistema?.estado.corDaFonte}}>
