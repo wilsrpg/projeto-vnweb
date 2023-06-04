@@ -14,8 +14,8 @@
     {"escreverMensagem": "Clebim:\nCleitão?! O que você está fazendo aqui?"},
     {"moverPersonagem": {"nome": "irmão", "espelhado": true}},
     {"escreverMensagem": "Cleitão:\nHum?"},
-    {"removerPersonagem": "protagonista"},
-    {"esperarTempo": 500},
-    {"removerPersonagem": "irmão"}
+    {"removerPersonagem": "protagonista", "esperarInteracao": true},
+    {"removerPersonagem": "irmão", "esperarTempo": 500},
+    {"mudarRoteiro": "teste", "esperarTempo": 500}
   ]
 }

@@ -55,7 +55,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       return { ...estado, ultimaVezQueCarregou: acao.numero1! };
 
     case acoes.mudarRoteiro:
-      return { ...estado, roteiroAtual: acao.numero1! };
+      return { ...estado, roteiroAtual: acao.string! };
 
     case acoes.mudarEvento:
       return { ...estado, eventoAtual: acao.numero1! };

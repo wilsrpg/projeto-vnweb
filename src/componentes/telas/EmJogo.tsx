@@ -5,14 +5,14 @@ import { contexto } from "../sistema/Contexto";
 
 export default function EmJogo() {
   const sistema = useContext(contexto);
-  const [roteiro, definirRoteiro] = useState(roteiros[0]);
+  const [roteiro, definirRoteiro] = useState(roteiros.capitulo1);
   if(sistema?.estado.msgsConsole.renderizacoes)
     console.log("renderizou emJogo");
 
   //configurações iniciais
   useEffect(()=>{
     if(sistema)
-      definirRoteiro(roteiros[sistema?.estado.roteiroAtual]);
+      definirRoteiro(roteiros[sistema?.estado.roteiroAtual as keyof typeof roteiros]);
     if(sistema?.estado.msgsConsole.effects)
       console.log("ef emJogo [], roteiroAtual="+sistema?.estado.roteiroAtual);
     sistema?.despachar({tipo: acoes.mudarEvento, numero1: 0});
@@ -34,11 +34,19 @@ export default function EmJogo() {
 
   useEffect(()=>{
     if(sistema?.estado.arquivoSalvoParaCarregar?.roteiroAtual != undefined){
+      let roteiroAtual = sistema?.estado.arquivoSalvoParaCarregar?.roteiroAtual;
       if(sistema?.estado.msgsConsole.effects)
-        console.log("ef emJogo salvo, carregando roteiro salvo="+sistema?.estado.arquivoSalvoParaCarregar.roteiroAtual);
-      definirRoteiro(roteiros[sistema?.estado.arquivoSalvoParaCarregar.roteiroAtual]);
+        console.log("ef emJogo salvo, carregando roteiro salvo="+roteiroAtual);
+      definirRoteiro(roteiros[roteiroAtual as keyof typeof roteiros]);
     }
   }, [sistema?.estado.arquivoSalvoParaCarregar])
+
+  useEffect(()=>{
+    if(sistema?.estado.msgsConsole.effects)
+      console.log("ef emJogo roteiroAtual="+sistema?.estado.roteiroAtual);
+    definirRoteiro(roteiros[sistema?.estado.roteiroAtual as keyof typeof roteiros]);
+    sistema?.despachar({tipo: acoes.mudarEvento, numero1: 0});
+  }, [sistema?.estado.roteiroAtual])
 
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
@@ -193,17 +201,25 @@ export default function EmJogo() {
         }
       }
 
-      if(roteiro[i].escreverMensagem){
-        if(sistema?.estado.msgsConsole.roteiro)
-          console.log("escrevendo="+roteiro[i].escreverMensagem);
-        sistema?.despachar({tipo: acoes.escreverMensagem, string: roteiro[i].escreverMensagem});
-      }
       if(roteiro[i].esperarInteracao){
         if(sistema?.estado.msgsConsole.roteiro)
           console.log("esperando interação");
         sistema?.despachar({tipo: acoes.aceitarInteracao, opcao: true});
       }
+
+      if(roteiro[i].escreverMensagem){
+        if(sistema?.estado.msgsConsole.roteiro)
+          console.log("escrevendo="+roteiro[i].escreverMensagem);
+        sistema?.despachar({tipo: acoes.escreverMensagem, string: roteiro[i].escreverMensagem});
+      }
       
+      if(roteiro[i].mudarRoteiro){
+        if(sistema?.estado.msgsConsole.roteiro)
+          console.log("mudando roteiro para "+roteiro[i].mudarRoteiro);
+        sistema?.despachar({tipo: acoes.mudarRoteiro, string: roteiro[i].mudarRoteiro});
+        sistema?.despachar({tipo: acoes.mudarEvento, numero1: 0});
+      }
+
       if(!roteiro[i].escreverMensagem && !roteiro[i].esperarInteracao){
         if(sistema?.estado.msgsConsole.roteiro)
           console.log("evento "+sistema.estado.eventoAtual+"; avançando para o próximo");

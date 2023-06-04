@@ -69,7 +69,7 @@ export default function Jogo() {
     despachar({tipo: acoes.removerTodosOsPersonagens});
     despachar({tipo: acoes.limparHistorico});
     despachar({tipo: acoes.escreverMensagem, string: ""});
-    despachar({tipo: acoes.mudarRoteiro, numero1: -1});
+    despachar({tipo: acoes.mudarRoteiro, string: ""});
     despachar({tipo: acoes.mudarEvento, numero1: -1});
     despachar({tipo: acoes.mudarTela, string: "menu inicial"});
   }

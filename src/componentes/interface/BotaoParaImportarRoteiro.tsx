@@ -114,7 +114,7 @@ export default function BotaoParaImportarRoteiro(prop:{nome: string,func: ()=>vo
         
         console.log("Roteiro JSON para teste carregado.");
         console.log(roteiroJson.roteiro);
-        roteiros[0] = roteiroJson.roteiro;
+        roteiros.teste = roteiroJson.roteiro;
 
         prop.func();
       } catch(e) {

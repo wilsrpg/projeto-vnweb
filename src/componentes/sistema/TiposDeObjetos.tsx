@@ -14,7 +14,7 @@ export interface salvo {
   dataDeInicio: number,
   tempoDeJogo: number,
   ultimaVezQueSalvou: number,
-  roteiroAtual: number,
+  roteiroAtual: string,
   eventoAtual: number,
   imagemDeFundoAtual: string,
   audioHabilitado: boolean,
@@ -43,6 +43,7 @@ class eventoEstrutura {
   removerCenario?: boolean;
   pararMusica?: boolean;
   esperarInteracao?: boolean;
+  mudarRoteiro?: string;
 }
 class personagemEstrutura {
   nome: string = "";
