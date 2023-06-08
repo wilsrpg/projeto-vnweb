@@ -29,7 +29,7 @@ export default function TelaInicial() {
 
   function menuNovoJogo(){
     if(sistema) sistema.estado.eventoAtual = -1; //isso impede um bug q acontecia qd a psoa voltava pra tela inicial no meio d um evento de espera, q fazia o roteiro seguinte pular o 1o evento na hr da execução
-    sistema?.despachar({tipo: acoes.mudarRoteiro, numero1: 1});
+    sistema?.despachar({tipo: acoes.mudarRoteiro, string: "capitulo1"});
     sistema?.despachar({tipo: acoes.mudarTela, string: "jogo"});
     sistema?.despachar({tipo: acoes.definirDataDeInicio, numero1: Date.now()});
     sistema?.despachar({tipo: acoes.definirTempoDeJogo, numero1: 0});
@@ -37,8 +37,12 @@ export default function TelaInicial() {
   }
 
   function menuTestarRoteiro(){
-    sistema?.despachar({tipo: acoes.mudarRoteiro, numero1: 0});
+    if(sistema) sistema.estado.eventoAtual = -1; //isso impede um bug q fazia o roteiro carregado pular o 2o evento na hr da execução
+    sistema?.despachar({tipo: acoes.mudarRoteiro, string: "teste"});
     sistema?.despachar({tipo: acoes.mudarTela, string: "jogo"});
+    sistema?.despachar({tipo: acoes.definirDataDeInicio, numero1: Date.now()});
+    sistema?.despachar({tipo: acoes.definirTempoDeJogo, numero1: 0});
+    sistema?.despachar({tipo: acoes.definirUltimaVezQueCarregou, numero1: Date.now()});
   }
 
   function menuOpcoes(){

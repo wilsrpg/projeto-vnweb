@@ -20,6 +20,7 @@ export enum acoes {
   moverPersonagem = "moverPersonagem",
   virarPersonagem = "virarPersonagem",
   removerPersonagem = "removerPersonagem",
+  //removerPersonagem2 = "removerPersonagem2",
   removerTodosOsPersonagens = "removerTodosOsPersonagens",
   exibirPainelInferior = "exibirPainelInferior",
   escreverMensagem = "escreverMensagem",
@@ -37,6 +38,7 @@ export enum acoes {
   excluirSalvo = "excluirSalvo",
   definirTempoDeJogo = "definirTempoDeJogo",
   adicionarPersonagensDoSalvo = "adicionarPersonagensDoSalvo",
+  redefinirEscolhas = "redefinirEscolhas",
 };
 
 //central de comando das funções do reducer; normalmente, cada comando atualiza
@@ -55,7 +57,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       return { ...estado, ultimaVezQueCarregou: acao.numero1! };
 
     case acoes.mudarRoteiro:
-      return { ...estado, roteiroAtual: acao.numero1! };
+      return { ...estado, roteiroAtual: acao.string! };
 
     case acoes.mudarEvento:
       return { ...estado, eventoAtual: acao.numero1! };
@@ -128,7 +130,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         posY: posY,
         espelhado: espelhar,
       };
-      return { ...estado, personagemParaAdicionar: persAdi };
+      return { ...estado, personagensParaAdicionar: [ ...estado.personagensParaAdicionar, persAdi] };
 
     case acoes.mudarSpritePersonagem:
       if(!acao.nome || !acao.endereco)
@@ -147,7 +149,9 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       persMud.endereco = acao.endereco;
       if(acao.opcao != undefined)
         persMud.espelhado = acao.opcao;
-      return { ...estado, personagemParaRemover: persMud.nome, personagemParaAdicionar: persMud };
+      //return { ...estado, personagemParaRemover: persMud.nome, personagemParaAdicionar: persMud };
+      return { ...estado, personagensIdParaRemover: [ ...estado.personagensIdParaRemover, idMud ],
+                          personagensParaAdicionar: [ ...estado.personagensParaAdicionar, persMud ] };
 
     case acoes.moverPersonagem:
       if(!acao.nome || !acao.string && acao.numero1 == undefined && acao.opcao == undefined)
@@ -179,7 +183,9 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       if(acao.opcao != undefined)
         persMov.espelhado = acao.opcao;
       
-      return { ...estado, personagemParaRemover: persMov.nome, personagemParaAdicionar: persMov };
+      //return { ...estado, personagemParaRemover: persMov.nome, personagemParaAdicionar: persMov };
+      return { ...estado, personagensIdParaRemover: [ ...estado.personagensIdParaRemover, idMov ],
+                          personagensParaAdicionar: [ ...estado.personagensParaAdicionar, persMov ] };
 
     case acoes.virarPersonagem:
       if(!acao.nome)
@@ -197,14 +203,26 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         persVir.espelhado = acao.opcao;
       else
         persVir.espelhado = !persVir.espelhado;
-      
-      return { ...estado, personagemParaRemover: persVir.nome, personagemParaAdicionar: persVir };
+      //console.log("pers espelhado="+persVir.espelhado);
+      //return { ...estado, personagemParaRemover: persVir.nome, personagemParaAdicionar: persVir };
+      return { ...estado, personagensIdParaRemover: [ ...estado.personagensIdParaRemover, idVir ],
+                          personagensParaAdicionar: [ ...estado.personagensParaAdicionar, persVir ] };
+
+    //case acoes.removerPersonagem:
+    //  if(!acao.nome)
+    //    return { ...estado, personagemParaRemover: null };
+    //  return { ...estado, personagemParaRemover: acao.nome };
 
     case acoes.removerPersonagem:
       if(!acao.nome)
-        return { ...estado, personagemParaRemover: null };
-      return { ...estado, personagemParaRemover: acao.nome };
-
+        return { ...estado };
+      let idRem = -1;
+      estado.personagensNaTela.map((pers,i)=>{
+        if(acao.nome && pers.nome == acao.nome)
+        idRem = i;
+      })
+      return { ...estado, personagensIdParaRemover: [ ...estado.personagensIdParaRemover, idRem ] };
+  
     case acoes.removerTodosOsPersonagens:
       if(acao.opcao == undefined)
         return { ...estado, removendoTodosOsPersonagens: true };
@@ -304,6 +322,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
           fonte: estado.fonte,
           corDaFonte: estado.corDaFonte,
           velocidadeDoTexto: estado.velocidadeDoTexto,
+          escolhas: estado.escolhas,
         };
         localStorage.salvo = JSON.stringify(arquivo);
         //console.log(JSON.parse(localStorage.salvo));
@@ -359,6 +378,9 @@ export function redutor(estado: iVariaveis, acao: Acao) {
     case acoes.definirTempoDeJogo:
       return { ...estado, tempoDeJogo: acao.numero1! };
     
+    case acoes.redefinirEscolhas:
+      return { ...estado, escolhas: [] };
+      
     default:
       // throw new Error("Opção '"+acao.tipo+"' não existe no redutor.\n");
       alert("Opção '"+acao.tipo+"' não existe no redutor.\n");

@@ -1,0 +1,14 @@
+{
+  "roteiro": [
+    {"mudarCenario": "imagensDeFundo.vila", "tocarMusica": "musicas.titulo", "esperarTempo": 1000},
+    {"escreverMensagem": "Selecione o roteiro que deseja executar."},
+    {"exibirAlternativas": {"nome": "selecionar roteiro", "alternativas": [
+      {"texto": "capitulo1", "valor": "capitulo1"},
+      {"texto": "frescura", "valor": "frescura"},
+      {"texto": "prólogo", "valor": "prólogo"}]}
+    },
+    {"seEscolha": {"nome": "selecionar roteiro", "valor": "capitulo1"},"esperarTempo": 500, "mudarRoteiro": "capitulo1"},
+    {"seEscolha": {"nome": "selecionar roteiro", "valor": "frescura"},"esperarTempo": 500, "mudarRoteiro": "frescura"},
+    {"seEscolha": {"nome": "selecionar roteiro", "valor": "prólogo"},"esperarTempo": 500, "mudarRoteiro": "prólogo"}
+  ]
+}

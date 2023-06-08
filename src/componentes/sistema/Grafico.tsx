@@ -41,8 +41,6 @@ export default function Grafico(){
       console.log("ef removTdsPers="+sistema?.estado.removendoTodosOsPersonagens);
     if(!sistema?.estado.removendoTodosOsPersonagens)
       return;
-    if(sistema?.estado.personagensNaTelaImg.length)
-      sistema.estado.personagensNaTelaImg.splice(0,sistema.estado.personagensNaTelaImg.length);
     if(sistema?.estado.personagensNaTela.length)
       sistema.estado.personagensNaTela.splice(0,sistema.estado.personagensNaTela.length);
     if(persDiv.current?.childElementCount)
@@ -53,53 +51,68 @@ export default function Grafico(){
 
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
-      console.log("ef persParaRemov="+sistema?.estado.personagemParaRemover);
-    if(!sistema?.estado.personagemParaRemover)
-      return;
-    let id = -1;
-    sistema.estado.personagensNaTela.map((pers,i)=>{
-      if(pers.nome == sistema?.estado.personagemParaRemover)
-        id = i;
-    });
-    if(persDiv.current?.children[id]){
-      const img = persDiv.current?.children[id];
-      if(img instanceof HTMLImageElement && sistema){
-        sistema.estado.personagensNaTela.splice(id,1);
-        sistema.estado.personagensNaTelaImg.splice(id,1);
-        sistema.ocultarElemento(img).then(()=> img.remove() );
-        sistema.despachar({tipo: acoes.removerPersonagem, opcao: false});
+      console.log("ef gráfico, personagensIdParaRemover.length="+sistema?.estado.personagensIdParaRemover.length);
+    remPers();
+
+    //return 
+  }, [sistema?.estado.personagensIdParaRemover])
+
+  async function remPers() {
+    if(sistema?.estado.personagensIdParaRemover && sistema?.estado.personagensIdParaRemover.length>0){
+      //sistema?.estado.personagensIdParaRemover.sort().reverse(); //por causa de persDiv.current.children
+      let id = sistema?.estado.personagensIdParaRemover[0];
+      sistema.estado.personagensIdParaRemover.shift();
+      //console.log("em remPers, removendo pers="+sistema?.estado.personagensNaTela[id].nome);
+      const img = document.getElementById("persImg-"+sistema?.estado.personagensNaTela[id].nome);
+      if(img instanceof HTMLImageElement){
+        await sistema.ocultarElemento(img);
+        //console.log("em remPers, ocultou, vai remover");
+        img.remove();
       }
+      sistema.estado.personagensNaTela.splice(id,1);
+      //console.log("em remPers, removido, pers restantes pra remover="+sistema?.estado.personagensIdParaRemover.length);
+      if(sistema?.estado.personagensIdParaRemover.length>0)
+        remPers();
     }
-  }, [sistema?.estado.personagemParaRemover])
+  }
 
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
-      console.log("ef persParaAdic="+sistema?.estado.personagemParaAdicionar?.endereco+", "+sistema?.estado.personagemParaAdicionar?.posicao);
-    if(!sistema?.estado.personagemParaAdicionar)
-      return;
-      const pers = new Image();
-      pers.src = sistema.estado.personagemParaAdicionar.endereco;
-      new Promise(r=>pers.addEventListener("load",r,{once: true}))
-      .then(()=>{
-        if(sistema.estado.personagemParaAdicionar?.espelhado == true)
-          pers.style.transform = "rotateY(180deg)";
-        sistema.estado.personagensNaTelaImg?.push(pers);
-        if(sistema?.estado.personagemParaAdicionar)
-          sistema.estado.personagensNaTela?.push(sistema?.estado.personagemParaAdicionar);
-        
-        //centralizar no ponto escolhido
-        let largPersRedimensionada = pers.width * estadoInicial.alturaTela/pers.height;
-        let posX = 0;
-        if(sistema?.estado.personagemParaAdicionar?.posX)
-          posX = sistema?.estado.personagemParaAdicionar?.posX - largPersRedimensionada/2;
-        let posY = 0;
-        if(sistema?.estado.personagemParaAdicionar?.posY)
-          posY = sistema?.estado.personagemParaAdicionar?.posY;
-        
-        adicionarPersonagem(posX, posY);
-        sistema.despachar({tipo: acoes.adicionarPersonagem, opcao: false});
-      })
-  }, [sistema?.estado.personagemParaAdicionar])
+      console.log("ef gráfico, personagensParaAdicionar.length="+sistema?.estado.personagensParaAdicionar.length);
+    if(sistema?.estado.personagensParaAdicionar)
+      addPers(sistema?.estado.personagensParaAdicionar);
+  }, [sistema?.estado.personagensParaAdicionar])
+
+  async function addPers(perss: personagem[]) {
+    if(perss.length>0){
+      //console.log("entrou addpers");
+      let pers = perss[0];
+      perss.shift();
+      const img = new Image();
+      img.id = "persImg-"+pers.nome;
+      img.src = pers.endereco;
+      //console.log("em addPers, adicionando pers="+pers.nome);
+      await new Promise(r=>img.addEventListener("load",r,{once: true}));
+      let largPersRedimensionada = img.width * sistema!.estado.alturaTela/img.height;
+      img.style.position = "absolute";
+      img.style.width = "auto";
+      img.style.height = "100%";
+      img.style.left = (pers.posX - largPersRedimensionada/2)+"px";
+      img.style.top = pers.posY+"px";
+      if(pers.espelhado == true)
+        img.style.transform = "rotateY(180deg)";
+      pers.sprite = img;
+
+      sistema?.estado.personagensNaTela.push(pers);
+      if(pers.sprite && persDiv.current){
+        persDiv.current.appendChild(pers.sprite);
+        sistema?.exibirElemento(pers.sprite);
+      }
+      //console.log("em addPers, adicionado, pers restantes="+sistema?.estado.personagensParaAdicionar.length);
+      //if(perss.length>0)
+        addPers(perss);
+    }
+  }
 
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
@@ -118,12 +131,13 @@ export default function Grafico(){
     if(tela)
       await sistema?.ocultarElemento(tela,100);
     if(sistema?.estado.arquivoSalvoParaCarregar){
-      await adicionarPersonagensDoArquivoSalvo(perss,0);
+      //await adicionarPersonagensDoArquivoSalvo(perss,0);
+      await addPers(perss);
       if(tela)
         sistema?.exibirElemento(tela,1000);
     }
   }
-
+/*
   async function adicionarPersonagensDoArquivoSalvo(perss: personagem[], n: number){
     if(n < perss.length){
       if(sistema?.estado.msgsConsole.effects)
@@ -131,8 +145,8 @@ export default function Grafico(){
       await adicionarPers2(perss[n]);
       adicionarPersonagensDoArquivoSalvo(perss,n+1);
     }
-  }
-
+  }*/
+/*
   async function adicionarPers2(persParaAdic: personagem) {
     if(!sistema)
       return;
@@ -160,23 +174,8 @@ export default function Grafico(){
     }
     sistema.despachar({tipo: acoes.adicionarPersonagem, opcao: false});
     return Promise.resolve;
-  }
+  }*/
   
-  function adicionarPersonagem(posX: number, posY = 0){
-    const persImg = sistema?.estado.personagensNaTelaImg[sistema?.estado.personagensNaTelaImg.length-1];
-    if(persImg){
-      persImg.style.position = "absolute";
-      persImg.style.height = "100%";
-      persImg.style.width = "auto";
-      persImg.style.top = posY+"px";
-      persImg.style.left = posX+"px";
-    }
-    if(persImg && persDiv.current){
-      persDiv.current.appendChild(persImg);
-      sistema.exibirElemento(persImg);
-    }
-  }
-
   return (
     <div id="gráfico">
       <img id="cenário" ref={cenarioImg}

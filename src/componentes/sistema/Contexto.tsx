@@ -1,14 +1,14 @@
 import { createContext, Dispatch } from "react";
 import { Acao, personagem, salvo } from "./TiposDeObjetos";
 
-let msgsConsoleGeral = Boolean(1);
+let msgsConsoleGeral = Boolean(0);
 
 export const estadoInicial: iVariaveis = {
   msgsConsole: {
     renderizacoes: msgsConsoleGeral && Boolean(0),
-    redutor: msgsConsoleGeral && Boolean(0),
+    redutor: msgsConsoleGeral && Boolean(1),
     effects: msgsConsoleGeral && Boolean(0),
-    roteiro: msgsConsoleGeral && Boolean(0),
+    roteiro: msgsConsoleGeral && Boolean(1),
     mouseTeclado: msgsConsoleGeral && Boolean(0),
   },
   larguraTela: 640,
@@ -22,15 +22,16 @@ export const estadoInicial: iVariaveis = {
   dataDeInicio: 0,
   tempoDeJogo: 0,
   ultimaVezQueCarregou: 0,
-  roteiroAtual: -1,
+  roteiroAtual: "",
   eventoAtual: -1,
   jogoPausado: false,
   aceitandoInteracao: true,
   exibindoPainelInferior: false,
-  personagensNaTelaImg: [],
   personagensNaTela: [],
   personagemParaAdicionar: null,
   personagemParaRemover: null,
+  personagensParaAdicionar: [],
+  personagensIdParaRemover: [],
   removendoTodosOsPersonagens: false,
   mensagemParaEscrever: "",
   digitandoMensagem: false,
@@ -42,6 +43,7 @@ export const estadoInicial: iVariaveis = {
   corDaFonte: "#ffffff",
   velocidadeDoTexto: 2,
   arquivoSalvoParaCarregar: null,
+  escolhas: [],
   adicionandoPersonagensDoSalvo: false,
 };
 
@@ -59,7 +61,7 @@ export interface iVariaveis {
   tempoDeJogo: number,
   ultimaVezQueCarregou: number,
   telaAtual: string,
-  roteiroAtual: number,
+  roteiroAtual: string,
   eventoAtual: number,
   jogoPausado: boolean,
   aceitandoInteracao: boolean,
@@ -69,9 +71,10 @@ export interface iVariaveis {
   musicaAtual: {endereco: string, volume: number} | null,
   somParaTocar: {endereco: string, volume: number} | null,
   personagensNaTela: personagem[],
-  personagensNaTelaImg: HTMLImageElement[],
   personagemParaAdicionar: personagem | null,
   personagemParaRemover: string | null,
+  personagensParaAdicionar: personagem[],
+  personagensIdParaRemover: number[],
   removendoTodosOsPersonagens: boolean,
   exibindoPainelInferior: boolean,
   mensagemParaEscrever: string,
@@ -84,6 +87,7 @@ export interface iVariaveis {
   corDaFonte: string,
   velocidadeDoTexto: number,
   arquivoSalvoParaCarregar: salvo | null,
+  escolhas: {nome: string, valor: string}[],
   adicionandoPersonagensDoSalvo: boolean,
 }
 
