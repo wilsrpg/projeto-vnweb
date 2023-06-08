@@ -68,18 +68,20 @@ export default function Som() {
     if(!sistema?.estado.audioHabilitado || !sistema?.estado.somParaTocar || !sistema?.estado.somParaTocar.endereco)
       return;
     somAudio.current.src = sistema?.estado.somParaTocar.endereco;
-    somAudio.current.volume = sistema?.estado.somParaTocar.volume/100 * sistema?.estado.volumeGeral/100;
-    if(sistema?.estado.msgsConsole.effects)
-      console.log("ef audio som="+somAudio.current.src);
-    //new Promise(r=>{
-    //  somAudio.current.addEventListener("loadeddata",r,{once: true})
-    //})
-    //.then(()=>{
+    new Promise(r=>{
+      somAudio.current.addEventListener("loadeddata",r,{once: true})
+    })
+    .then(()=>{
+      if(sistema?.estado.msgsConsole.effects)
+        console.log("ef audio som="+somAudio.current.src);
+      if(sistema.estado.somParaTocar)
+        somAudio.current.volume = sistema?.estado.somParaTocar.volume/100 * sistema?.estado.volumeGeral/100;
       somAudio.current.play();
       sistema.despachar({tipo: acoes.tocarSom, opcao: false}); //faz com q sistema.estado.somParaTocar = null
     //}).catch(()=>{
     //  sistema.despachar({tipo: acoes.tocarSom, opcao: false}); //faz com q sistema.estado.somParaTocar = null
-    //});
+    })
+    .catch(); //n tou sabendo tirar akela msg d erro dos dois sons da apresentação...
   }, [sistema?.estado.somParaTocar])
 
   return (

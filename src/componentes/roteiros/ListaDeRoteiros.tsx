@@ -6,4 +6,5 @@ import { roteiro as roteiro1 } from "./Roteiro1";
 export let roteiros = {
   teste: roteiroTeste,
   capitulo1: roteiro1,
+  frescura: roteiroTeste,
 }

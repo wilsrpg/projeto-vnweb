@@ -30,8 +30,9 @@ export default function Botao(prop:{
             volume = prop.som.volume;
           }
           sistema?.despachar({tipo: acoes.tocarSom, endereco: endereco, numero1: volume});
-        } else
-          sistema?.despachar({tipo: acoes.tocarSom, endereco: sons.bip});
+        }
+        //else
+        //  sistema?.despachar({tipo: acoes.tocarSom, endereco: sons.bip});
         prop.func();
       }}
       style={prop.style}

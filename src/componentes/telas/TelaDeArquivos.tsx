@@ -32,6 +32,46 @@ export default function TelaDeArquivos(){
           wordBreak: "break-word",
         }}
       >
+        <div id="imagem ampliada"
+          style={{
+            //opacity: 0,
+            display: "none",
+            width: "50%",
+            height: "100%",
+            //border: "solid 2px white",
+            float: "right",
+            //boxSizing: "border-box",
+          }}
+        >
+          <input type="button"
+            value="×"
+            style={{
+              float: "right"
+            }}
+            onClick={()=>{
+              let previa = document.getElementById("imagem ampliada");
+              if(previa)
+                previa.style.display = "none";
+              //if(previa?.parentElement)
+              //  previa.parentElement.style.display = "none";
+            }}
+          />
+          <span id="imagem ampliada legenda"
+            style={{
+              display: "block",
+              float: "right",
+              //textAlign: "center"
+            }}
+          />
+          <img id="imagem ampliada imagem" style={{
+              display: "block",
+              maxWidth: "100%",
+              //height: "auto",
+              maxHeight: "95%",
+              float: "right",
+            }}
+          />
+        </div>
         <GerenciadorDeArquivos
           titulo="Imagens de fundo"
           tipo="imagem"

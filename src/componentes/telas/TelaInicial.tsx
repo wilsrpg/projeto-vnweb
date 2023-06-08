@@ -37,8 +37,12 @@ export default function TelaInicial() {
   }
 
   function menuTestarRoteiro(){
+    if(sistema) sistema.estado.eventoAtual = -1; //isso impede um bug q fazia o roteiro carregado pular o 2o evento na hr da execução
     sistema?.despachar({tipo: acoes.mudarRoteiro, string: "teste"});
     sistema?.despachar({tipo: acoes.mudarTela, string: "jogo"});
+    sistema?.despachar({tipo: acoes.definirDataDeInicio, numero1: Date.now()});
+    sistema?.despachar({tipo: acoes.definirTempoDeJogo, numero1: 0});
+    sistema?.despachar({tipo: acoes.definirUltimaVezQueCarregou, numero1: Date.now()});
   }
 
   function menuOpcoes(){
