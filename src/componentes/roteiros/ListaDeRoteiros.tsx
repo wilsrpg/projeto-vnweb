@@ -4,7 +4,7 @@ import { roteiro as roteiro1 } from "./Roteiro1";
 //todas as cenas devem constar neste objeto para serem acessíveis ao
 //seletor de roteiros
 export let roteiros = {
-  teste: roteiroTeste,
+  roteiroImportado: roteiroTeste,
   capitulo1: roteiro1,
   frescura: roteiroTeste,
 }

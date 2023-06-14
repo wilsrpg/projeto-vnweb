@@ -1,5 +1,5 @@
 import { createContext, Dispatch } from "react";
-import { Acao, personagem, salvo } from "./TiposDeObjetos";
+import { Acao, escolha, personagem, salvo } from "./TiposDeObjetos";
 
 let msgsConsoleGeral = Boolean(0);
 
@@ -7,8 +7,8 @@ export const estadoInicial: iVariaveis = {
   msgsConsole: {
     renderizacoes: msgsConsoleGeral && Boolean(0),
     redutor: msgsConsoleGeral && Boolean(1),
-    effects: msgsConsoleGeral && Boolean(0),
-    roteiro: msgsConsoleGeral && Boolean(1),
+    effects: msgsConsoleGeral && Boolean(1),
+    roteiro: msgsConsoleGeral && Boolean(0),
     mouseTeclado: msgsConsoleGeral && Boolean(0),
   },
   larguraTela: 640,
@@ -28,10 +28,10 @@ export const estadoInicial: iVariaveis = {
   aceitandoInteracao: true,
   exibindoPainelInferior: false,
   personagensNaTela: [],
-  personagemParaAdicionar: null,
-  personagemParaRemover: null,
-  personagensParaAdicionar: [],
+  //personagemParaAdicionar: null,
+  //personagemParaRemover: null,
   personagensIdParaRemover: [],
+  personagensParaAdicionar: [],
   removendoTodosOsPersonagens: false,
   mensagemParaEscrever: "",
   digitandoMensagem: false,
@@ -71,10 +71,10 @@ export interface iVariaveis {
   musicaAtual: {endereco: string, volume: number} | null,
   somParaTocar: {endereco: string, volume: number} | null,
   personagensNaTela: personagem[],
-  personagemParaAdicionar: personagem | null,
-  personagemParaRemover: string | null,
-  personagensParaAdicionar: personagem[],
+  //personagemParaAdicionar: personagem | null,
+  //personagemParaRemover: string | null,
   personagensIdParaRemover: number[],
+  personagensParaAdicionar: personagem[],
   removendoTodosOsPersonagens: boolean,
   exibindoPainelInferior: boolean,
   mensagemParaEscrever: string,
@@ -87,7 +87,7 @@ export interface iVariaveis {
   corDaFonte: string,
   velocidadeDoTexto: number,
   arquivoSalvoParaCarregar: salvo | null,
-  escolhas: {nome: string, valor: string}[],
+  escolhas: escolha[],
   adicionandoPersonagensDoSalvo: boolean,
 }
 

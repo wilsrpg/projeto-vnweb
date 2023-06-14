@@ -9,6 +9,13 @@ export default function CaixaDeDialogo(prop:{largura: string}){
 
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
+      console.log("ef cxDiag salvo");
+    if(sistema?.estado.arquivoSalvoParaCarregar)
+      apagarMensagem();
+  }, [sistema?.estado.arquivoSalvoParaCarregar]);
+
+  useEffect(()=>{
+    if(sistema?.estado.msgsConsole.effects)
       console.log("ef cxDiag msgParaEscr="+sistema?.estado.mensagemParaEscrever);
     if(sistema?.estado.mensagemParaEscrever.length){
       sistema?.despachar({tipo: acoes.aceitarInteracao, opcao: true});

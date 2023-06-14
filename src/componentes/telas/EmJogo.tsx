@@ -3,12 +3,14 @@ import { roteiros } from "../roteiros/ListaDeRoteiros";
 import { acoes } from "../sistema/Redutor";
 import { contexto } from "../sistema/Contexto";
 import Botao from "../interface/Botao";
-import { alternativas } from "../sistema/TiposDeObjetos";
+import { alternativas, escolha } from "../sistema/TiposDeObjetos";
 
 export default function EmJogo() {
   const sistema = useContext(contexto);
   const [roteiro, definirRoteiro] = useState(roteiros.capitulo1);
   const [grupoDeAlternativas, criarJanelaDeAlternativas] = useState<alternativas>();
+  //const escolhasLocais = useRef<escolha[]>([]);
+  //const marcadores = useRef<{nome: string, evento: number}[]>([]);
   if(sistema?.estado.msgsConsole.renderizacoes)
     console.log("renderizou emJogo");
 
@@ -25,6 +27,9 @@ export default function EmJogo() {
     })
 
     return ()=>{
+      const cxDialogo = document.getElementById("dialogo");
+      if(cxDialogo instanceof HTMLPreElement)
+        cxDialogo.style.display = "none";
       const controles = document.getElementById("controles");
       if(controles)
         sistema?.ocultarElemento(controles);
@@ -41,6 +46,7 @@ export default function EmJogo() {
       if(sistema.estado.msgsConsole.effects)
         console.log("ef emJogo salvo, carregando roteiro salvo="+roteiroAtual);
       definirRoteiro(roteiros[roteiroAtual as keyof typeof roteiros]);
+      criarJanelaDeAlternativas(undefined);
     }
   }, [sistema?.estado.arquivoSalvoParaCarregar])
 
@@ -78,23 +84,89 @@ export default function EmJogo() {
       if(sistema.estado.msgsConsole.roteiro)
         console.log("emjogo, lendo roteiroAtual="+sistema.estado.roteiroAtual);
 
+      if(roteiro[i].marcador){
+        if(sistema.estado.msgsConsole.roteiro)
+          console.log("emjogo, definindo marcador="+roteiro[i].marcador+", para o evento="+i);
+        //let nomeDoMarcador = roteiro[i].marcador;
+        //if(nomeDoMarcador)
+        //  marcadores.current.push({nome: nomeDoMarcador, evento: i});
+      }
+
       if(roteiro[i].seEscolha){
         if(sistema.estado.msgsConsole.roteiro)
           console.log("emjogo, evento condicional: escolha="+roteiro[i].seEscolha?.nome+", valor="+roteiro[i].seEscolha?.valor);
         //evento condicional, só executa o resto do evento se o jogador tiver feito aquela escolha anteriormente
         //console.log("verificando escolhas");
-        if(!sistema.estado.escolhas.some((escolha,j)=>{
-          //console.log("escolhas["+j+"]="+escolha.nome+","+escolha.valor);
-          //console.log(escolha.nome == roteiro[i].seEscolha?.nome && escolha.valor == roteiro[i].seEscolha?.valor);
-          return escolha.nome == roteiro[i].seEscolha?.nome && escolha.valor == roteiro[i].seEscolha?.valor;
-        })){
+        let achouEscolha: escolha | undefined;
+        /*escolhasLocais.current.some((escolha,j)=>{
+          //console.log("procurando escolha '"+roteiro[i].seEscolha?.nome+","+roteiro[i].seEscolha?.valor+"' nas escolhas locais="+j+" ("+escolha.nome+","+escolha.valor+")");
+          if(escolha.nome == roteiro[i].seEscolha?.nome && escolha.valor == roteiro[i].seEscolha?.valor){
+            //console.log("achou escolha local");
+            achouEscolha = escolha;
+          }
+          return achouEscolha;
+        })
+        if(!achouEscolha)*/
+          sistema.estado.escolhas.some((escolha,j)=>{
+            //console.log("procurando escolha '"+roteiro[i].seEscolha?.nome+","+roteiro[i].seEscolha?.valor+"' nas escolhas salvas="+j+" ("+escolha.nome+","+escolha.valor+")");
+            if(escolha.nome == roteiro[i].seEscolha?.nome && escolha.valor == roteiro[i].seEscolha?.valor){
+              //console.log("achou escolha salva");
+              achouEscolha = escolha;
+            }
+            return achouEscolha;
+          })
+        if(!achouEscolha){
           sistema.despachar({tipo: acoes.proximoEvento});
           return;
         }
+
+        // if(!sistema.estado.escolhas.some((escolha,j)=>{
+        //   //console.log("escolhas["+j+"]="+escolha.nome+","+escolha.valor);
+        //   //console.log(escolha.nome == roteiro[i].seEscolha?.nome && escolha.valor == roteiro[i].seEscolha?.valor);
+        //   return escolha == roteiro[i].seEscolha;
+        //   return escolha.nome == roteiro[i].seEscolha?.nome && escolha.valor == roteiro[i].seEscolha?.valor;
+        // })){
+        //   sistema.despachar({tipo: acoes.proximoEvento});
+        //   return;
+        // }
       }
   
+      if(roteiro[i].irParaMarcador){
+        if(sistema.estado.msgsConsole.roteiro)
+          console.log("emjogo, indo para marcador="+roteiro[i].irParaMarcador);
+        //evento condicional, só executa o resto do evento se o jogador tiver feito aquela escolha anteriormente
+        //console.log("verificando escolhas");
+        let nomeDoMarcador = roteiro[i].irParaMarcador;
+        let eventoDestino: number | undefined;
+        //if(nomeDoMarcador)
+        // marcadores.current.some((marcador)=>{
+        //   if(marcador.nome == roteiro[i].irParaMarcador)
+        //     eventoDestino = marcador.evento;
+        //   return eventoDestino = marcador.evento;
+        // })
+        roteiro.some((evento,j)=>{
+          //console.log("procurando marcador '"+nomeDoMarcador+"' no evento="+j+" ("+evento.marcador+")");
+          if(evento.marcador == nomeDoMarcador){
+            eventoDestino = j;
+            //console.log("achou marcador '"+nomeDoMarcador+"' no evento "+j);
+          }
+          return eventoDestino == j;
+        })
+        if(eventoDestino != undefined){
+          sistema.despachar({tipo: acoes.mudarEvento, numero1: eventoDestino});
+          return;
+        } else {
+          alert("Na instrução irParaMarcador, marcador '"+nomeDoMarcador+"' não encontrado.");
+          return;
+        }
+      }
+
       if(!roteiro[i].escreverMensagem && !roteiro[i].exibirAlternativas){ //se exibindo alternativas, não apaga a msg anterior
         sistema.despachar({tipo: acoes.escreverMensagem, string: ""});
+      }
+
+      if(roteiro[i].removerCenario){
+        sistema.despachar({tipo: acoes.mudarImagemDeFundo, endereco: ""});
       }
 
       if(roteiro[i].mudarCenario){
@@ -104,8 +176,8 @@ export default function EmJogo() {
         sistema.despachar({tipo: acoes.mudarImagemDeFundo, endereco: bgi});
       }
       
-      if(roteiro[i].removerCenario){
-        sistema.despachar({tipo: acoes.mudarImagemDeFundo, endereco: ""});
+      if(roteiro[i].pararMusica){
+        sistema.despachar({tipo: acoes.tocarMusica, endereco: ""});
       }
 
       if(roteiro[i].tocarMusica){
@@ -126,10 +198,6 @@ export default function EmJogo() {
             volume = bgm.volume;
         }
         sistema.despachar({tipo: acoes.tocarMusica, endereco: endereco, numero1: volume});
-      }
-
-      if(roteiro[i].pararMusica){
-        sistema.despachar({tipo: acoes.tocarMusica, endereco: ""});
       }
 
       if(roteiro[i].tocarSom){
@@ -234,8 +302,11 @@ export default function EmJogo() {
       }
       
       if(roteiro[i].exibirAlternativas){
-        if(sistema.estado.msgsConsole.roteiro)
-          console.log("emjogo, exibindo alternativas="+roteiro[i].exibirAlternativas?.nome+" ("+roteiro[i].exibirAlternativas?.alternativas.length+")");
+        if(sistema.estado.msgsConsole.roteiro){
+          let alternativas: string[] = [];
+          roteiro[i].exibirAlternativas?.alternativas.map((alternativa)=>alternativas.push(alternativa.valor));
+          console.log("emjogo, exibindo alternativas="+roteiro[i].exibirAlternativas?.nome+": "+alternativas.join());
+        }
         criarJanelaDeAlternativas(roteiro[i].exibirAlternativas);
       }
       
@@ -280,23 +351,67 @@ export default function EmJogo() {
             <div id="alternativas"
               style={{
                 //position: "absolute",
+                minWidth: "50%",
+                minHeight: "20%",
                 border: "solid 2px gray",
                 backgroundColor: "black",
                 padding: "1%",
                 //display: "flex",
                 //flexDirection: "column",
                 display: "grid",
+                placeItems: "center",
                 //grid: "auto/max-content",
                 //placeContent: "space-evenly center",
               }}
             >
+              {grupoDeAlternativas.titulo &&
+              <p style={{
+                margin: "1%",
+                color: sistema?.estado.corDaFonte,
+                fontFamily: sistema?.estado.fonte,
+                }}
+              >
+                {grupoDeAlternativas.titulo}
+              </p>}
               {grupoDeAlternativas.alternativas.map((alternativa, i)=>
-                <Botao key={i} nome={alternativa.texto} func={()=>{
-                  sistema?.estado.escolhas.push({nome: grupoDeAlternativas.nome, valor: alternativa.valor});
-                  //console.log("escolhas.length="+sistema?.estado.escolhas.length+", escolha[0]="+sistema?.estado.escolhas[0].nome+","+sistema?.estado.escolhas[0].valor);
-                  sistema?.despachar({tipo: acoes.proximoEvento});
-                  criarJanelaDeAlternativas(undefined);
-                }}/>
+                <Botao key={i} nome={alternativa.texto}
+                  style={{margin: "1%"}}
+                  func={()=>{
+                    let iEscolha: number | undefined;
+                    /*if(!grupoDeAlternativas.guardar){
+                      escolhasLocais.current.some((escolha,i)=>{
+                        if(escolha.nome == grupoDeAlternativas.nome)
+                          iEscolha = i;
+                        return escolha.nome == grupoDeAlternativas.nome;
+                      });
+                      if(iEscolha != undefined)
+                        escolhasLocais.current[iEscolha].valor = alternativa.valor;
+                      else
+                        escolhasLocais.current.push({nome: grupoDeAlternativas.nome, valor: alternativa.valor})
+                      
+                      //if(!escolhasLocais.current.some((escolha)=>{
+                      //  if(escolha.nome == grupoDeAlternativas.nome)
+                      //    escolha.valor = alternativa.valor;
+                      //  return escolha.nome == grupoDeAlternativas.nome;
+                      //}))
+                      //  escolhasLocais.current.push({nome: grupoDeAlternativas.nome, valor: alternativa.valor})
+                    } else */
+                    if(sistema){
+                      sistema.estado.escolhas.some((escolha,i)=>{
+                        if(escolha.nome == grupoDeAlternativas.nome)
+                          iEscolha = i;
+                        return escolha.nome == grupoDeAlternativas.nome;
+                      });
+                      if(iEscolha != undefined)
+                        sistema.estado.escolhas[iEscolha].valor = alternativa.valor;
+                      else
+                        sistema.estado.escolhas.push({nome: grupoDeAlternativas.nome, valor: alternativa.valor});
+                    }
+                    //console.log("escolhas.length="+sistema?.estado.escolhas.length+", escolha[0]="+sistema?.estado.escolhas[0].nome+","+sistema?.estado.escolhas[0].valor);
+                    sistema?.despachar({tipo: acoes.proximoEvento});
+                    criarJanelaDeAlternativas(undefined);
+                  }}
+                />
               )}
             </div>
           </div>

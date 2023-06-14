@@ -197,13 +197,26 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         if(acao.nome && pers.nome == acao.nome)
           idVir = i;
       })
-      persVir = estado.personagensNaTela[idVir];
-
-      if(acao.opcao != undefined)
-        persVir.espelhado = acao.opcao;
+      persVir = {
+        nome: estado.personagensNaTela[idVir].nome,
+        endereco: estado.personagensNaTela[idVir].endereco,
+        posicao: estado.personagensNaTela[idVir].posicao,
+        posX: estado.personagensNaTela[idVir].posX,
+        posY: estado.personagensNaTela[idVir].posY,
+        sprite: estado.personagensNaTela[idVir].sprite,
+        espelhado: false //tive q fazer assim pq a repetição de comandos do modo dev tava invertendo 2x esse valor, qd acao.opcao==undefined (ver abaixo)
+      };
+      
+      //console.log("em redutor, acao.opcao="+acao.opcao);
+      //console.log("em redutor ants, persVir.espelhado="+persVir.espelhado);
+      if(acao.opcao == undefined)
+        persVir.espelhado = !estado.personagensNaTela[idVir].espelhado; //o modo dev executa 2x essa instrução, por isso
+        //persVir não pode ser atribuído com estado.personagensNaTela[idVir], senão persVir.espelhado será um referência a
+        //estado.personagensNaTela[idVir].espelhado, oq faz com q seu valor seja invertido 2x aqui, voltando ao original ¬¬
+        //por isso, precisei criar um novo personagem com tds as propriedades de estado.personagensNaTela[idVir], exceto espelhado
       else
-        persVir.espelhado = !persVir.espelhado;
-      //console.log("pers espelhado="+persVir.espelhado);
+        persVir.espelhado = acao.opcao;
+      //console.log("em redutor dps, persVir.espelhado="+persVir.espelhado);
       //return { ...estado, personagemParaRemover: persVir.nome, personagemParaAdicionar: persVir };
       return { ...estado, personagensIdParaRemover: [ ...estado.personagensIdParaRemover, idVir ],
                           personagensParaAdicionar: [ ...estado.personagensParaAdicionar, persVir ] };
@@ -287,9 +300,11 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         return { ...estado };
       
     case acoes.mudarVelocidadeDoTexto:
-      if(acao.numero1)
+      if(acao.numero1){
+        if(acao.numero1 > 3) acao.numero1 = 3;
+        if(acao.numero1 < 1) acao.numero1 = 1;
         return { ...estado, velocidadeDoTexto: acao.numero1 };
-      else
+      } else
         return { ...estado };
 
     case acoes.salvar:
@@ -299,6 +314,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       } else {
         let arqSalvo = JSON.parse(localStorage.salvo);
         salvar = confirm("Sobrescrever o jogo salvo?"
+          +"\nRoteiro: "+arqSalvo.roteiroAtual
           +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
           +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
           +"\nTempo de jogo: "+converterEmHoras(arqSalvo.tempoDeJogo)
@@ -339,6 +355,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       } else {
         let arqSalvo = JSON.parse(localStorage.salvo);
         let carregar = confirm("Carregar o jogo salvo?"
+          +"\nRoteiro: "+arqSalvo.roteiroAtual
           +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
           +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
           +"\nTempo de jogo: "+converterEmHoras(arqSalvo.tempoDeJogo)
@@ -356,6 +373,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       } else {
         let arqSalvo = JSON.parse(localStorage.salvo);
         let excluir = confirm("Excluir o jogo salvo?"
+          +"\nRoteiro: "+arqSalvo.roteiroAtual
           +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
           +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
           +"\nTempo de jogo: "+converterEmHoras(arqSalvo.tempoDeJogo)

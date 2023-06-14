@@ -17,7 +17,7 @@ export default function Som() {
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
       console.log("ef áudio habilitado="+sistema?.estado.audioHabilitado);
-    if(sistema?.estado.audioHabilitado){
+    if(sistema?.estado.audioHabilitado && sistema.estado.musicaAtual?.endereco){
       audioElem.current?.play();
     } else {
       somAudio.current.pause();
@@ -30,7 +30,7 @@ export default function Som() {
 
   useEffect(()=>{
     let volumeMusica = 100;
-    if(sistema?.estado.musicaAtual?.volume)
+    if(sistema?.estado.musicaAtual?.volume != undefined)
       volumeMusica = sistema.estado.musicaAtual.volume;
     if(audioElem.current && sistema)
       audioElem.current.volume = volumeMusica/100 * sistema.estado.volumeGeral/100;
@@ -45,7 +45,7 @@ export default function Som() {
       audioElem.current.pause();
       audioElem.current.currentTime = 0;
     }
-    if(sistema?.estado.musicaAtual?.endereco)
+    if(sistema?.estado.musicaAtual?.endereco != undefined)
       audioElem.current.src = sistema?.estado.musicaAtual?.endereco;
     new Promise(r=>audioElem.current?.addEventListener("loadeddata",r,{once: true}))
     .then(()=>{
@@ -81,7 +81,8 @@ export default function Som() {
     //}).catch(()=>{
     //  sistema.despachar({tipo: acoes.tocarSom, opcao: false}); //faz com q sistema.estado.somParaTocar = null
     })
-    .catch(); //n tou sabendo tirar akela msg d erro dos dois sons da apresentação...
+    //.catch(); //n tou sabendo tirar akela msg d erro dos dois sons da apresentação...
+    //o.o sumiu, n sei como kk
   }, [sistema?.estado.somParaTocar])
 
   return (

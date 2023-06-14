@@ -47,7 +47,6 @@ class eventoEstrutura {
   marcador?: string;
   irParaMarcador?: string;
   exibirAlternativas?: alternativas;
-  //exibirAlternativas?: {nome: string, alternativas: {texto: string, valor: string}[]};
   seEscolha?: escolha;
   mudarRoteiro?: string;
 }
@@ -66,8 +65,9 @@ class audioEstrutura {
 }
 class alternativasEstrutura {
   nome: string = "";
-  texto?: string;
+  titulo?: string;
   alternativas: alternativa[] = [];
+  //guardar?: boolean;
 }
 class alternativaEstrutura {
   texto: string = "";

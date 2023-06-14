@@ -1,14 +1,59 @@
 {
   "roteiro": [
-    {"mudarCenario": "imagensDeFundo.vila", "tocarMusica": "musicas.titulo", "esperarTempo": 1000},
-    {"escreverMensagem": "Selecione o roteiro que deseja executar."},
-    {"exibirAlternativas": {"nome": "selecionar roteiro", "alternativas": [
-      {"texto": "capitulo1", "valor": "capitulo1"},
-      {"texto": "frescura", "valor": "frescura"},
-      {"texto": "prólogo", "valor": "prólogo"}]}
+    {"removerCenario": true, "pararMusica": true},
+    {"esperarTempo": 500},
+    {"marcador": "menu", "exibirAlternativas": {"nome": "menu", "titulo": "Menu", "alternativas": [
+      {"texto": "Mudar imagem de fundo", "valor": "bgi"},
+      {"texto": "Mudar música", "valor": "bgm"},
+      {"texto": "Selecionar roteiro", "valor": "roteiro"}]}
     },
-    {"seEscolha": {"nome": "selecionar roteiro", "valor": "capitulo1"},"esperarTempo": 500, "mudarRoteiro": "capitulo1"},
-    {"seEscolha": {"nome": "selecionar roteiro", "valor": "frescura"},"esperarTempo": 500, "mudarRoteiro": "frescura"},
-    {"seEscolha": {"nome": "selecionar roteiro", "valor": "prólogo"},"esperarTempo": 500, "mudarRoteiro": "prólogo"}
+    {"seEscolha": {"nome": "menu", "valor": "bgi"}, "irParaMarcador": "bgi"},
+    {"seEscolha": {"nome": "menu", "valor": "bgm"}, "irParaMarcador": "bgm"},
+    {"seEscolha": {"nome": "menu", "valor": "roteiro"}, "irParaMarcador": "roteiro"},
+    
+    {"marcador": "bgi", "esperarTempo": 200,
+      "exibirAlternativas": {"nome": "bgi", "titulo": "Selecione a imagem de fundo que deseja exibir:", "alternativas": [
+        {"texto": "Título", "valor": "bgititulo"},
+        {"texto": "Vila", "valor": "bgivila"},
+        {"texto": "Vila destruída", "valor": "bgiviladestruida"},
+        {"texto": "Remover imagem de fundo", "valor": "remover"},
+        {"texto": "Voltar", "valor": "voltar"}]
+      }
+    },
+    {"seEscolha": {"nome": "bgi", "valor": "bgititulo"}, "mudarCenario": "imagensDeFundo.titulo"},
+    {"seEscolha": {"nome": "bgi", "valor": "bgivila"}, "mudarCenario": "imagensDeFundo.vila"},
+    {"seEscolha": {"nome": "bgi", "valor": "bgiviladestruida"}, "mudarCenario": "imagensDeFundo.vilaDestruida"},
+    {"seEscolha": {"nome": "bgi", "valor": "remover"}, "removerCenario": true},
+    {"seEscolha": {"nome": "bgi", "valor": "voltar"}, "irParaMarcador": "menu"},
+    {"irParaMarcador": "bgi"},
+
+    {"marcador": "bgm", "esperarTempo": 200,
+      "exibirAlternativas": {"nome": "bgm", "titulo": "Selecione a música que deseja executar:", "alternativas": [
+        {"texto": "Título", "valor": "bgmtitulo"},
+        {"texto": "Vila", "valor": "bgmvila"},
+        {"texto": "Vila destruída", "valor": "bgmviladestruida"},
+        {"texto": "Parar música", "valor": "parar"},
+        {"texto": "Voltar", "valor": "voltar"}]
+      }
+    },
+    {"seEscolha": {"nome": "bgm", "valor": "bgmtitulo"}, "tocarMusica": {"endereco": "musicas.idk", "volume": 50}},
+    {"seEscolha": {"nome": "bgm", "valor": "bgmvila"}, "tocarMusica": "musicas.titulo"},
+    {"seEscolha": {"nome": "bgm", "valor": "bgmviladestruida"}, "tocarMusica": "musicas.teste"},
+    {"seEscolha": {"nome": "bgm", "valor": "parar"}, "pararMusica": true},
+    {"seEscolha": {"nome": "bgm", "valor": "voltar"}, "irParaMarcador": "menu"},
+    {"irParaMarcador": "bgm"},
+    
+    {"marcador": "roteiro", "esperarTempo": 200,
+      "exibirAlternativas": {"nome": "roteiro", "titulo": "Selecione o roteiro que deseja executar:", "alternativas": [
+        {"texto": "Capítulo 1", "valor": "capitulo1"},
+        {"texto": "Frescura", "valor": "frescura"},
+        {"texto": "Prólogo", "valor": "prólogo"},
+        {"texto": "Voltar", "valor": "voltar"}]
+      }
+    },
+    {"seEscolha": {"nome": "roteiro", "valor": "capitulo1"}, "esperarTempo": 500, "mudarRoteiro": "capitulo1"},
+    {"seEscolha": {"nome": "roteiro", "valor": "frescura"}, "esperarTempo": 500, "mudarRoteiro": "frescura"},
+    {"seEscolha": {"nome": "roteiro", "valor": "prólogo"}, "esperarTempo": 500, "mudarRoteiro": "prólogo"},
+    {"seEscolha": {"nome": "roteiro", "valor": "voltar"}, "irParaMarcador": "menu"}
   ]
 }

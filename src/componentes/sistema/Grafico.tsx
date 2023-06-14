@@ -27,8 +27,9 @@ export default function Grafico(){
 
   async function transicionarImagemDeFundo(tempo = 500) {
     if(cenarioImg.current){
-      await sistema?.ocultarElemento(cenarioImg.current, tempo);
-      if (sistema?.estado.imagemDeFundoAtual)
+      //if(sistema?.estado.imagemDeFundoAtual) //só oculta se existir e não for string vazia
+        await sistema?.ocultarElemento(cenarioImg.current, tempo);
+      if (sistema?.estado.imagemDeFundoAtual != undefined)
         cenarioImg.current.src = sistema.estado.imagemDeFundoAtual;
       await new Promise(r=>{cenarioImg.current?.addEventListener("load",r,{once: true})});
       if(cenarioImg.current.src)
@@ -70,6 +71,7 @@ export default function Grafico(){
         img.remove();
       }
       sistema.estado.personagensNaTela.splice(id,1);
+      //console.log("em remPers, removeu, personagens na tela="+sistema?.estado.personagensNaTela.length);
       //console.log("em remPers, removido, pers restantes pra remover="+sistema?.estado.personagensIdParaRemover.length);
       if(sistema?.estado.personagensIdParaRemover.length>0)
         remPers();
@@ -107,7 +109,10 @@ export default function Grafico(){
       if(pers.sprite && persDiv.current){
         persDiv.current.appendChild(pers.sprite);
         sistema?.exibirElemento(pers.sprite);
+        //await sistema?.exibirElemento(pers.sprite);
+        //console.log("em addPers, adicionou, vai exibir");
       }
+      //console.log("em addPers, adicionou, personagens na tela="+sistema?.estado.personagensNaTela.length);
       //console.log("em addPers, adicionado, pers restantes="+sistema?.estado.personagensParaAdicionar.length);
       //if(perss.length>0)
         addPers(perss);
@@ -117,13 +122,14 @@ export default function Grafico(){
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
       console.log("ef gráfico, adicionarPersonagensDoSalvo="+sistema?.estado.adicionandoPersonagensDoSalvo);
-    if(sistema?.estado.arquivoSalvoParaCarregar && sistema.estado.arquivoSalvoParaCarregar.personagensNaTela.length
-       && sistema?.estado.adicionandoPersonagensDoSalvo){
+    if(!sistema?.estado.arquivoSalvoParaCarregar || !sistema?.estado.adicionandoPersonagensDoSalvo)
+      return;
+    else if(sistema.estado.arquivoSalvoParaCarregar.personagensNaTela.length){
       const perss = sistema.estado.arquivoSalvoParaCarregar.personagensNaTela;
       aux(perss);
-      sistema.despachar({tipo: acoes.adicionarPersonagensDoSalvo, opcao: false});
-      sistema.despachar({tipo: acoes.carregar, opcao: false});
     }
+    sistema.despachar({tipo: acoes.adicionarPersonagensDoSalvo, opcao: false});
+    sistema.despachar({tipo: acoes.carregar, opcao: false});
   }, [sistema?.estado.adicionandoPersonagensDoSalvo])
   
   async function aux(perss: personagem[]) {
