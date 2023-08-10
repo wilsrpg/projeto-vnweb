@@ -6,7 +6,7 @@ import { musicas } from "../mapeadores/Musicas";
 import { sons } from "../mapeadores/Sons";
 import Botao from "./Botao";
 import { roteiros } from "../roteiros/ListaDeRoteiros";
-import { evento, propsAudios, propsEventos, propsPersonagens } from "../sistema/TiposDeObjetos";
+import { evento, propsAlternativa, propsAlternativas, propsAudios, propsEscolhas, propsEventos, propsPersonagens } from "../sistema/TiposDeObjetos";
 
 export default function BotaoParaImportarRoteiro(prop:{nome: string,func: ()=>void}) {
   const sistema = useContext(contexto);
@@ -36,7 +36,7 @@ export default function BotaoParaImportarRoteiro(prop:{nome: string,func: ()=>vo
           //console.log(chave+" ("+typeof chave+"): "+valor+" ("+typeof valor+"): ");
           if(typeof valor != "object"){
           let achouEvento = false;
-          let todasProps = propsEventos.concat(propsPersonagens,propsAudios);
+          let todasProps = propsEventos.concat(propsPersonagens,propsAudios,propsEscolhas,propsAlternativas,propsAlternativa);
           todasProps.map((nomeDoEvento)=>{
             //console.log(nomeDoEvento);
             if(chave == nomeDoEvento){
@@ -57,18 +57,6 @@ export default function BotaoParaImportarRoteiro(prop:{nome: string,func: ()=>vo
         evs.map((ev)=>{
           //console.log("entrou, ev="+Object.keys(ev));
           Object.entries(ev).map(([chave,valor])=>{
-            //let achou = propsEventos.some((nomeDoEvento)=>{
-            //  //console.log(n+"=="+nomeDoEvento+"?");
-            //  return n == nomeDoEvento;
-            //});
-            ////console.log("teste some="+achou);
-            ////if(achou){
-            ////  //console.log("retornou");
-            ////  return;
-            ////} else
-            //if(!achou)
-            //  throw new Error("Instrução '"+n+"' não é uma instrução válida de evento.");
-            
             if(!propsEventos.some((nomeDoEvento) => chave == nomeDoEvento))
               throw new Error("Instrução '"+chave+"' não é uma instrução válida de evento.");
 
@@ -84,37 +72,38 @@ export default function BotaoParaImportarRoteiro(prop:{nome: string,func: ()=>vo
                   throw new Error("Propriedade '"+prop+"' não é uma propriedade válida de evento de áudio.");
               });
             }
+            if(propsEventos.some(() => chave == "exibirAlternativas")){
+              Object.entries(valor).map(([prop])=>{
+                //console.log("prop="+prop);
+                if(!propsAlternativas.some((nomeDaProp) => prop == nomeDaProp))
+                  throw new Error("Propriedade '"+prop+"' não é uma propriedade válida de evento de escolha.");
+              });
+            }
+            if(propsEventos.some(() => chave == "alternativas")){
+              Object.entries(valor).map(([prop])=>{
+                if(!propsAlternativas.some((nomeDaProp) => prop == nomeDaProp))
+                  throw new Error("Propriedade '"+prop+"' não é uma propriedade válida de alternativa.");
+              });
+            }
+            if(propsEventos.some(() => chave == "seEscolha")){
+              Object.entries(valor).map(([prop])=>{
+                if(!propsEscolhas.some((nomeDaProp) => prop == nomeDaProp))
+                  throw new Error("Propriedade '"+prop+"' não é uma propriedade válida de evento condicional.");
+              });
+            }
             let propDesnecessaria = propsEventos.some(() => typeof valor == "object"
-              && (!chave.includes("Personagem") && !chave.includes("tocar") || chave.includes("remover")) );
+              && (!chave.includes("Personagem") && !chave.includes("tocar") || chave.includes("remover"))
+              && chave != "seEscolha" && chave != "exibirAlternativas");
             if(propDesnecessaria)
               throw new Error("Instrução '"+chave+"' não possui propriedades, mas está recebendo a propriedade '"
                               +Object.entries(valor)[0][0]+"'."); //valor é o objeto com as props,
                               //o 1o [0] eh a primeira prop com seu par [chave,valor], o 2o [0] eh a chave dela
-            //let achouEvento = false;
-            //propsEventos.map((nomeDoEvento)=>{
-            //  //let a = nomeDoEvento as keyof evento;
-            //  //console.log(n+"=="+nomeDoEvento+"?");
-            //  //if(ev == a){
-            //  if(n == nomeDoEvento){
-            //    achouEvento = true;
-            //    //console.log("achou");
-            //    return;
-            //  }
-            //});
-            //if(achouEvento){
-            //  //console.log("retornou");
-            //  return;
-            //} else
-            //  throw new Error("Instrução '"+n+"' não é uma instrução válida de evento.");
           });
         });
 
-        //});
-        //let rot: evento[] = roteiroJson.roteiro;
-        
         console.log("Roteiro JSON para teste carregado.");
         console.log(roteiroJson.roteiro);
-        roteiros[0] = roteiroJson.roteiro;
+        roteiros.roteiroImportado = roteiroJson.roteiro;
 
         prop.func();
       } catch(e) {

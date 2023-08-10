@@ -1,10 +1,11 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { acoes } from "../sistema/Redutor";
 import { contexto } from "../sistema/Contexto";
 import Botao from "./Botao";
 
 export default function CaixaDeBotoes(prop:{largura: string}){
   const sistema = useContext(contexto);
+  const botoesHabilitados = useRef(true);
   if(sistema?.estado.msgsConsole.renderizacoes)
     console.log("renderizou cxBotões");
 
@@ -30,18 +31,48 @@ export default function CaixaDeBotoes(prop:{largura: string}){
       }}
     >
       <Botao nome="Áudio"
-        func={()=>sistema?.despachar({tipo: acoes.alternarAudio})}
+        func={()=>{
+          if(botoesHabilitados.current)
+            sistema?.despachar({tipo: acoes.alternarAudio});
+        }}
         style={{
           textDecorationLine: sistema?.estado.audioHabilitado ? "none" : "line-through",
         }}
       />
       <Botao nome="sem função" func={()=>{}}/>
-      <Botao nome="Salvar" func={()=>sistema?.despachar({tipo: acoes.salvar})}/>
-      <Botao nome="Carregar" func={()=>sistema?.despachar({tipo: acoes.carregar})}/>
+      <Botao nome="Salvar"
+        func={()=>{
+          if(botoesHabilitados.current)
+            sistema?.despachar({tipo: acoes.salvar});
+        }}
+      />
+      <Botao nome="Carregar"
+        func={()=>{
+          if(botoesHabilitados.current)
+            sistema?.despachar({tipo: acoes.carregar});
+        }}
+      />
       <Botao nome="nada" func={()=>{}}/>
-      <Botao nome="Histórico" func={()=>sistema?.despachar({tipo: acoes.exibirTelaDoHistorico, opcao: true})}/>
-      <Botao nome="Opções" func={()=>sistema?.despachar({tipo: acoes.exibirTelaDeOpcoes, opcao: true})}/>
-      <Botao nome="Voltar" func={()=>{sistema?.voltarParaTelaInicial()}}/>
+      <Botao nome="Histórico"
+        func={()=>{
+          if(botoesHabilitados.current)
+            sistema?.despachar({tipo: acoes.exibirTelaDoHistorico, opcao: true});
+        }}
+      />
+      <Botao nome="Opções"
+        func={()=>{
+          if(botoesHabilitados.current)
+            sistema?.despachar({tipo: acoes.exibirTelaDeOpcoes, opcao: true});
+        }}
+      />
+      <Botao nome="Voltar"
+        func={()=>{
+          if(botoesHabilitados.current){
+            botoesHabilitados.current = false;
+            sistema?.voltarParaTelaInicial();
+          }
+        }}
+      />
     </div>
   )
 }

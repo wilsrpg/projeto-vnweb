@@ -20,6 +20,7 @@ export enum acoes {
   moverPersonagem = "moverPersonagem",
   virarPersonagem = "virarPersonagem",
   removerPersonagem = "removerPersonagem",
+  //removerPersonagem2 = "removerPersonagem2",
   removerTodosOsPersonagens = "removerTodosOsPersonagens",
   exibirPainelInferior = "exibirPainelInferior",
   escreverMensagem = "escreverMensagem",
@@ -37,6 +38,7 @@ export enum acoes {
   excluirSalvo = "excluirSalvo",
   definirTempoDeJogo = "definirTempoDeJogo",
   adicionarPersonagensDoSalvo = "adicionarPersonagensDoSalvo",
+  redefinirEscolhas = "redefinirEscolhas",
 };
 
 //central de comando das funções do reducer; normalmente, cada comando atualiza
@@ -55,7 +57,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       return { ...estado, ultimaVezQueCarregou: acao.numero1! };
 
     case acoes.mudarRoteiro:
-      return { ...estado, roteiroAtual: acao.numero1! };
+      return { ...estado, roteiroAtual: acao.string! };
 
     case acoes.mudarEvento:
       return { ...estado, eventoAtual: acao.numero1! };
@@ -128,7 +130,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         posY: posY,
         espelhado: espelhar,
       };
-      return { ...estado, personagemParaAdicionar: persAdi };
+      return { ...estado, personagensParaAdicionar: [ ...estado.personagensParaAdicionar, persAdi] };
 
     case acoes.mudarSpritePersonagem:
       if(!acao.nome || !acao.endereco)
@@ -147,7 +149,9 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       persMud.endereco = acao.endereco;
       if(acao.opcao != undefined)
         persMud.espelhado = acao.opcao;
-      return { ...estado, personagemParaRemover: persMud.nome, personagemParaAdicionar: persMud };
+      //return { ...estado, personagemParaRemover: persMud.nome, personagemParaAdicionar: persMud };
+      return { ...estado, personagensIdParaRemover: [ ...estado.personagensIdParaRemover, idMud ],
+                          personagensParaAdicionar: [ ...estado.personagensParaAdicionar, persMud ] };
 
     case acoes.moverPersonagem:
       if(!acao.nome || !acao.string && acao.numero1 == undefined && acao.opcao == undefined)
@@ -179,7 +183,9 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       if(acao.opcao != undefined)
         persMov.espelhado = acao.opcao;
       
-      return { ...estado, personagemParaRemover: persMov.nome, personagemParaAdicionar: persMov };
+      //return { ...estado, personagemParaRemover: persMov.nome, personagemParaAdicionar: persMov };
+      return { ...estado, personagensIdParaRemover: [ ...estado.personagensIdParaRemover, idMov ],
+                          personagensParaAdicionar: [ ...estado.personagensParaAdicionar, persMov ] };
 
     case acoes.virarPersonagem:
       if(!acao.nome)
@@ -191,20 +197,45 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         if(acao.nome && pers.nome == acao.nome)
           idVir = i;
       })
-      persVir = estado.personagensNaTela[idVir];
-
-      if(acao.opcao != undefined)
-        persVir.espelhado = acao.opcao;
-      else
-        persVir.espelhado = !persVir.espelhado;
+      persVir = {
+        nome: estado.personagensNaTela[idVir].nome,
+        endereco: estado.personagensNaTela[idVir].endereco,
+        posicao: estado.personagensNaTela[idVir].posicao,
+        posX: estado.personagensNaTela[idVir].posX,
+        posY: estado.personagensNaTela[idVir].posY,
+        sprite: estado.personagensNaTela[idVir].sprite,
+        espelhado: false //tive q fazer assim pq a repetição de comandos do modo dev tava invertendo 2x esse valor, qd acao.opcao==undefined (ver abaixo)
+      };
       
-      return { ...estado, personagemParaRemover: persVir.nome, personagemParaAdicionar: persVir };
+      //console.log("em redutor, acao.opcao="+acao.opcao);
+      //console.log("em redutor ants, persVir.espelhado="+persVir.espelhado);
+      if(acao.opcao == undefined)
+        persVir.espelhado = !estado.personagensNaTela[idVir].espelhado; //o modo dev executa 2x essa instrução, por isso
+        //persVir não pode ser atribuído com estado.personagensNaTela[idVir], senão persVir.espelhado será um referência a
+        //estado.personagensNaTela[idVir].espelhado, oq faz com q seu valor seja invertido 2x aqui, voltando ao original ¬¬
+        //por isso, precisei criar um novo personagem com tds as propriedades de estado.personagensNaTela[idVir], exceto espelhado
+      else
+        persVir.espelhado = acao.opcao;
+      //console.log("em redutor dps, persVir.espelhado="+persVir.espelhado);
+      //return { ...estado, personagemParaRemover: persVir.nome, personagemParaAdicionar: persVir };
+      return { ...estado, personagensIdParaRemover: [ ...estado.personagensIdParaRemover, idVir ],
+                          personagensParaAdicionar: [ ...estado.personagensParaAdicionar, persVir ] };
+
+    //case acoes.removerPersonagem:
+    //  if(!acao.nome)
+    //    return { ...estado, personagemParaRemover: null };
+    //  return { ...estado, personagemParaRemover: acao.nome };
 
     case acoes.removerPersonagem:
       if(!acao.nome)
-        return { ...estado, personagemParaRemover: null };
-      return { ...estado, personagemParaRemover: acao.nome };
-
+        return { ...estado };
+      let idRem = -1;
+      estado.personagensNaTela.map((pers,i)=>{
+        if(acao.nome && pers.nome == acao.nome)
+        idRem = i;
+      })
+      return { ...estado, personagensIdParaRemover: [ ...estado.personagensIdParaRemover, idRem ] };
+  
     case acoes.removerTodosOsPersonagens:
       if(acao.opcao == undefined)
         return { ...estado, removendoTodosOsPersonagens: true };
@@ -269,9 +300,11 @@ export function redutor(estado: iVariaveis, acao: Acao) {
         return { ...estado };
       
     case acoes.mudarVelocidadeDoTexto:
-      if(acao.numero1)
+      if(acao.numero1){
+        if(acao.numero1 > 3) acao.numero1 = 3;
+        if(acao.numero1 < 1) acao.numero1 = 1;
         return { ...estado, velocidadeDoTexto: acao.numero1 };
-      else
+      } else
         return { ...estado };
 
     case acoes.salvar:
@@ -281,6 +314,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       } else {
         let arqSalvo = JSON.parse(localStorage.salvo);
         salvar = confirm("Sobrescrever o jogo salvo?"
+          +"\nRoteiro: "+arqSalvo.roteiroAtual
           +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
           +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
           +"\nTempo de jogo: "+converterEmHoras(arqSalvo.tempoDeJogo)
@@ -304,6 +338,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
           fonte: estado.fonte,
           corDaFonte: estado.corDaFonte,
           velocidadeDoTexto: estado.velocidadeDoTexto,
+          escolhas: estado.escolhas,
         };
         localStorage.salvo = JSON.stringify(arquivo);
         //console.log(JSON.parse(localStorage.salvo));
@@ -320,6 +355,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       } else {
         let arqSalvo = JSON.parse(localStorage.salvo);
         let carregar = confirm("Carregar o jogo salvo?"
+          +"\nRoteiro: "+arqSalvo.roteiroAtual
           +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
           +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
           +"\nTempo de jogo: "+converterEmHoras(arqSalvo.tempoDeJogo)
@@ -337,6 +373,7 @@ export function redutor(estado: iVariaveis, acao: Acao) {
       } else {
         let arqSalvo = JSON.parse(localStorage.salvo);
         let excluir = confirm("Excluir o jogo salvo?"
+          +"\nRoteiro: "+arqSalvo.roteiroAtual
           +"\nInício: "+converterEmData(arqSalvo.dataDeInicio)
           +"\nÚltimo vez que salvou: "+converterEmData(arqSalvo.ultimaVezQueSalvou)
           +"\nTempo de jogo: "+converterEmHoras(arqSalvo.tempoDeJogo)
@@ -359,6 +396,9 @@ export function redutor(estado: iVariaveis, acao: Acao) {
     case acoes.definirTempoDeJogo:
       return { ...estado, tempoDeJogo: acao.numero1! };
     
+    case acoes.redefinirEscolhas:
+      return { ...estado, escolhas: [] };
+      
     default:
       // throw new Error("Opção '"+acao.tipo+"' não existe no redutor.\n");
       alert("Opção '"+acao.tipo+"' não existe no redutor.\n");

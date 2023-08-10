@@ -9,6 +9,13 @@ export default function CaixaDeDialogo(prop:{largura: string}){
 
   useEffect(()=>{
     if(sistema?.estado.msgsConsole.effects)
+      console.log("ef cxDiag salvo");
+    if(sistema?.estado.arquivoSalvoParaCarregar)
+      apagarMensagem();
+  }, [sistema?.estado.arquivoSalvoParaCarregar]);
+
+  useEffect(()=>{
+    if(sistema?.estado.msgsConsole.effects)
       console.log("ef cxDiag msgParaEscr="+sistema?.estado.mensagemParaEscrever);
     if(sistema?.estado.mensagemParaEscrever.length){
       sistema?.despachar({tipo: acoes.aceitarInteracao, opcao: true});
@@ -28,7 +35,7 @@ export default function CaixaDeDialogo(prop:{largura: string}){
       setTimeout(() => {
         let mensagemDigitada = msg?.slice(0,caracsDigitados);
         if(dialDiv.current && mensagemDigitada)
-          dialDiv.current.innerHTML = mensagemDigitada;
+          dialDiv.current.innerText = mensagemDigitada;
         if(caracsDigitados < msgLength)
           digitarCarac(caracsDigitados+1);
         else {
@@ -37,14 +44,14 @@ export default function CaixaDeDialogo(prop:{largura: string}){
         }
       }, 70-sistema.estado.velocidadeDoTexto*20); //velocidade do texto: 1, 2 ou 3 = um caractere a cada 50, 30 ou 10 ms
     } else if(dialDiv.current && sistema){
-        dialDiv.current.innerHTML = msg;
+        dialDiv.current.innerText = msg;
         sistema.despachar({tipo: acoes.adicionarAoHistorico, string: msg});
     }
   }, [caracsDigitados]);
 
   function apagarMensagem(){
     if(dialDiv.current)
-      dialDiv.current.innerHTML = "";
+      dialDiv.current.innerText = "";
   }
 
   return (

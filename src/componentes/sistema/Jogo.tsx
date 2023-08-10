@@ -1,11 +1,13 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, useRef } from "react";
 import { contexto, estadoInicial } from "./Contexto";
 import Grafico from "./Grafico";
 import Som from "./Som";
 import { acoes, redutor } from "./Redutor";
+import { salvo } from "./TiposDeObjetos";
 
 export default function Jogo() {
   const [estado, despachar] = useReducer(redutor, estadoInicial);
+  //const interagiu = useRef(false);
   if(estado.msgsConsole.renderizacoes)
     console.log("renderizou jogo");
 
@@ -17,31 +19,38 @@ export default function Jogo() {
     // document.body.onclick=(e: React.MouseEvent<HTMLDivElement, MouseEvent>)=>{capturarClique(e)};
   }, [])
 
+  //useEffect(()=>{
+  //  if(estado.msgsConsole.effects)
+  //    console.log("ef jogo []");
+  //  interagiu.current = !estado.aceitandoInteracao;
+  //}, [estado.aceitandoInteracao])
+
   useEffect(()=>{
     if(!estado.arquivoSalvoParaCarregar)
       return;
-    let arquivo = estado.arquivoSalvoParaCarregar;
+    let arquivo: salvo = estado.arquivoSalvoParaCarregar;
     despachar({tipo: acoes.definirDataDeInicio, numero1: arquivo.dataDeInicio});
     despachar({tipo: acoes.definirTempoDeJogo, numero1: arquivo.tempoDeJogo});
+    estado.escolhas = arquivo.escolhas;
     despachar({tipo: acoes.mudarTela, string: "jogo"});
     despachar({tipo: acoes.removerTodosOsPersonagens});
     despachar({tipo: acoes.adicionarPersonagensDoSalvo});
-    despachar({tipo: acoes.mudarRoteiro, numero1: arquivo.roteiroAtual});
+    despachar({tipo: acoes.mudarRoteiro, string: arquivo.roteiroAtual});
     despachar({tipo: acoes.mudarEvento, numero1: arquivo.eventoAtual});
     despachar({tipo: acoes.mudarImagemDeFundo, endereco: arquivo.imagemDeFundoAtual});
     if(estado.audioHabilitado != arquivo.audioHabilitado)
       despachar({tipo: acoes.alternarAudio});
     despachar({tipo: acoes.mudarVolume, numero1: arquivo.volumeGeral});
-    despachar({tipo: acoes.tocarMusica, endereco: arquivo.musicaAtual.endereco, numero1: arquivo.musicaAtual.volume});
+    despachar({tipo: acoes.tocarMusica, endereco: arquivo.musicaAtual?.endereco, numero1: arquivo.musicaAtual?.volume});
     despachar({tipo: acoes.mudarFonte, string: arquivo.fonte});
     despachar({tipo: acoes.mudarCorDaFonte, string: arquivo.corDaFonte});
     despachar({tipo: acoes.mudarVelocidadeDoTexto, numero1: arquivo.velocidadeDoTexto});
     despachar({tipo: acoes.limparHistorico});
-    arquivo.historicoDeMensagens.map((msg: string, i: number)=>{
-      if(i < arquivo.historicoDeMensagens.length-1)
-        despachar({tipo: acoes.adicionarAoHistorico, string: msg});
+    arquivo.historicoDeMensagens.map((mensagem, i)=>{
+      if(i < arquivo.historicoDeMensagens.length-1 || !arquivo.mensagemParaEscrever || arquivo.digitandoMensagem)
+        despachar({tipo: acoes.adicionarAoHistorico, string: mensagem});
     });
-    if(!estado.digitandoMensagem)
+    if(!arquivo.digitandoMensagem)
       despachar({tipo: acoes.escreverMensagem, string: arquivo.mensagemParaEscrever});
   }, [estado.arquivoSalvoParaCarregar])
 
@@ -68,8 +77,9 @@ export default function Jogo() {
   function voltarParaTelaInicial() {
     despachar({tipo: acoes.removerTodosOsPersonagens});
     despachar({tipo: acoes.limparHistorico});
+    despachar({tipo: acoes.redefinirEscolhas});
     despachar({tipo: acoes.escreverMensagem, string: ""});
-    despachar({tipo: acoes.mudarRoteiro, numero1: -1});
+    despachar({tipo: acoes.mudarRoteiro, string: ""});
     despachar({tipo: acoes.mudarEvento, numero1: -1});
     despachar({tipo: acoes.mudarTela, string: "menu inicial"});
   }
@@ -82,10 +92,12 @@ export default function Jogo() {
   }
 
   function interagir(){
+    //if(estado.aceitandoInteracao && !estado.exibindoTelaDeOpcoes && !estado.exibindoTelaDoHistorico && !interagiu.current)
     if(estado.aceitandoInteracao && !estado.exibindoTelaDeOpcoes && !estado.exibindoTelaDoHistorico)
       if(estado.digitandoMensagem)
         despachar({tipo: acoes.digitarMensagem, opcao: false});
       else {
+        //interagiu.current = true;
         despachar({tipo: acoes.aceitarInteracao, opcao: false});
         despachar({tipo: acoes.proximoEvento});
       }

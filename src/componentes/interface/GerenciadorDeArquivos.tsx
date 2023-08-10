@@ -82,7 +82,24 @@ export default function GerenciadorDeArquivos(prop:{
     {Object.entries(arrays[array]).map(([nome,endereco],k)=>
     <div key={k*2}>
       {prop.tipo == "imagem" &&
-        <img src={endereco} height="20" style={{marginRight: "1%", border: "solid 1px white"}}/>
+        <img src={endereco} height="20"
+          style={{
+            marginRight: "1%",
+            //border: "solid 1px white",
+            cursor: "pointer",
+          }}
+          onClick={()=>{
+            let previa = document.getElementById("imagem ampliada");
+            if(previa)
+              previa.style.display = "block";
+            let imagem = document.getElementById("imagem ampliada imagem");
+            if(imagem instanceof HTMLImageElement)
+              imagem.src = endereco;
+            let legenda = document.getElementById("imagem ampliada legenda");
+            if(legenda)
+              legenda.innerText = prop.nomeDoObjetoDestinoDosArquivos+"."+nome;
+          }}
+        />
       }
       {prop.tipo == "áudio" &&
         <Botao nome="►"

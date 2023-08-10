@@ -27,18 +27,29 @@ export default function TelaInicial() {
     })
   }, [])
 
-  function menuNovoJogo(){
+  function iniciarJogo(){
     if(sistema) sistema.estado.eventoAtual = -1; //isso impede um bug q acontecia qd a psoa voltava pra tela inicial no meio d um evento de espera, q fazia o roteiro seguinte pular o 1o evento na hr da execução
-    sistema?.despachar({tipo: acoes.mudarRoteiro, numero1: 1});
-    sistema?.despachar({tipo: acoes.mudarTela, string: "jogo"});
+    sistema?.despachar({tipo: acoes.mudarImagemDeFundo, endereco: ""});
+    sistema?.despachar({tipo: acoes.tocarMusica, endereco: ""});
     sistema?.despachar({tipo: acoes.definirDataDeInicio, numero1: Date.now()});
     sistema?.despachar({tipo: acoes.definirTempoDeJogo, numero1: 0});
     sistema?.despachar({tipo: acoes.definirUltimaVezQueCarregou, numero1: Date.now()});
+    if(menuInicial)
+      sistema?.ocultarElemento(menuInicial);
+    new Promise(r=>setTimeout(r,500))
+    .then(()=>{
+      sistema?.despachar({tipo: acoes.mudarTela, string: "jogo"});
+    });
+  }
+
+  function menuNovoJogo(){
+    iniciarJogo();
+    sistema?.despachar({tipo: acoes.mudarRoteiro, string: "capitulo1"});
   }
 
   function menuTestarRoteiro(){
-    sistema?.despachar({tipo: acoes.mudarRoteiro, numero1: 0});
-    sistema?.despachar({tipo: acoes.mudarTela, string: "jogo"});
+    iniciarJogo();
+    sistema?.despachar({tipo: acoes.mudarRoteiro, string: "roteiroImportado"});
   }
 
   function menuOpcoes(){
