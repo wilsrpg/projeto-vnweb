@@ -4,11 +4,14 @@ on:
   pull_request:
     branches:
       - main
+    types:
+      - closed
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
 
     steps:
       - name: Checkout repo
@@ -35,7 +38,7 @@ jobs:
     name: Deploy
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    #if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Download artifact
